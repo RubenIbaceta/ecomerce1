@@ -1,0 +1,17 @@
+{
+  "name": "electronics-store-demo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n client,server -c cyan,magenta \"npm run dev --workspace @ecommerce/client\" \"npm run dev --workspace @ecommerce/server\"",
+    "build": "npm run build --workspace @ecommerce/client && npm run build --workspace @ecommerce/server",
+    "typecheck": "npm run typecheck --workspace @ecommerce/client && npm run typecheck --workspace @ecommerce/server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
