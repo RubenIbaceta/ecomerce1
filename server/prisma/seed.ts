@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { hashPassword } from '../src/modules/auth/password.ts';
 
 dotenv.config({ path: new URL('../../.env', import.meta.url) });
 
@@ -50,7 +51,31 @@ async function main() {
     }
   }
 
-  console.log('Catálogo demo cargado.');
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (Boolean(adminEmail) !== Boolean(adminPassword)) {
+    throw new Error('Configura ADMIN_EMAIL y ADMIN_PASSWORD juntos para crear el usuario administrador.');
+  }
+  if (adminEmail && adminPassword) {
+    if (adminPassword.length < 12 || adminPassword.length > 128) {
+      throw new Error('ADMIN_PASSWORD debe tener entre 12 y 128 caracteres.');
+    }
+    const passwordHash = await hashPassword(adminPassword);
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: { name: process.env.ADMIN_NAME?.trim() || 'Administrador', role: 'ADMIN', isActive: true },
+      create: {
+        name: process.env.ADMIN_NAME?.trim() || 'Administrador',
+        email: adminEmail,
+        passwordHash,
+        role: 'ADMIN',
+      },
+    });
+    console.log('Catálogo demo cargado y administrador configurado.');
+    return;
+  }
+
+  console.log('Catálogo demo cargado. Define ADMIN_EMAIL y ADMIN_PASSWORD para crear el administrador.');
 }
 
 main()

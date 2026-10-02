@@ -1,6 +1,12 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import CatalogPage from '../features/catalog/CatalogPage';
 import ProductPage from '../features/catalog/ProductPage';
+import { AuthProvider, useAuth } from '../features/auth/AuthContext';
+import AdminPage from '../features/auth/AdminPage';
+import LoginPage from '../features/auth/LoginPage';
+import ProfilePage from '../features/auth/ProfilePage';
+import ProtectedRoute from '../features/auth/ProtectedRoute';
+import RegisterPage from '../features/auth/RegisterPage';
 
 function HomePage() {
   return (
@@ -12,8 +18,7 @@ function HomePage() {
         Tecnología para lo que viene.
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-        Una tienda demo de productos electrónicos. El catálogo y las compras se
-        incorporarán en las siguientes fases.
+        Una tienda demo de hardware para PC. Ya puedes explorar el catálogo; el carrito y las compras llegarán en las siguientes fases.
       </p>
       <div className="mt-10">
         <Link
@@ -38,7 +43,9 @@ function NotFoundPage() {
   );
 }
 
-export default function App() {
+function AppContent() {
+  const { user, loading, signOut } = useAuth();
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
@@ -47,9 +54,28 @@ export default function App() {
             Electro<span className="text-blue-700">Demo</span>
           </Link>
           <nav aria-label="Navegación principal">
-            <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/catalogo">
+            <div className="flex items-center gap-5">
+              <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/catalogo">
               Catálogo
-            </Link>
+              </Link>
+              {!loading && (user ? (
+                <>
+                  <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/perfil">Mi cuenta</Link>
+                  <button
+                    className="text-sm font-medium text-slate-700 hover:text-blue-700"
+                    onClick={() => { void signOut(); }}
+                    type="button"
+                  >
+                    Cerrar sesión
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/ingresar">Ingresar</Link>
+                  <Link className="text-sm font-medium text-blue-700 hover:underline" to="/registro">Crear cuenta</Link>
+                </>
+              ))}
+            </div>
           </nav>
         </div>
       </header>
@@ -57,6 +83,14 @@ export default function App() {
         <Route element={<HomePage />} path="/" />
         <Route element={<CatalogPage />} path="/catalogo" />
         <Route element={<ProductPage />} path="/productos/:slug" />
+        <Route element={<LoginPage />} path="/ingresar" />
+        <Route element={<RegisterPage />} path="/registro" />
+        <Route element={<ProtectedRoute />} >
+          <Route element={<ProfilePage />} path="/perfil" />
+        </Route>
+        <Route element={<ProtectedRoute role="ADMIN" />}>
+          <Route element={<AdminPage />} path="/admin" />
+        </Route>
         <Route element={<NotFoundPage />} path="*" />
       </Routes>
       <footer className="border-t border-slate-200 bg-white">
@@ -66,4 +100,8 @@ export default function App() {
       </footer>
     </div>
   );
+}
+
+export default function App() {
+  return <AuthProvider><AppContent /></AuthProvider>;
 }

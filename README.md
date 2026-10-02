@@ -12,6 +12,11 @@ E-commerce de práctica de una tienda de **hardware y tecnología para PC**, des
 
 ## Funcionalidades
 
+- Registro e inicio/cierre de sesión.
+- Perfil de cliente.
+- Sesiones persistidas en PostgreSQL.
+- Área de administración protegida por rol.
+- Contraseñas almacenadas con hash scrypt; nunca en texto plano.
 - Catálogo de productos
 - Categorías
 - Búsqueda y filtros
@@ -57,3 +62,7 @@ API: `http://localhost:3001/api/v1/health`
 🚧 Proyecto en desarrollo.
 
 Proyecto creado con fines de **práctica y portafolio profesional**.
+
+## Configuración de autenticación
+
+Configura en el archivo .env un SESSION_SECRET aleatorio de al menos 32 caracteres. Para crear el administrador inicial, define ADMIN_EMAIL y ADMIN_PASSWORD (12 caracteres o más) antes de ejecutar el seed. Estas credenciales son locales y no se suben a GitHub.
