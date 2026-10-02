@@ -53,7 +53,10 @@ function newOrderNumber() {
 
 const orderInclude = {
   items: { orderBy: { createdAt: 'asc' as const } },
-  payments: { orderBy: { createdAt: 'desc' as const } },
+  payments: {
+    orderBy: { createdAt: 'desc' as const },
+    select: { id: true, provider: true, status: true, amountClp: true, authorizedAt: true, createdAt: true },
+  },
 };
 
 export async function createOrder(userId: string, shipping: ShippingInput) {

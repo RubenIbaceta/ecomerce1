@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { formatPrice } from '../catalog/catalog.api';
 import { fetchOrders, orderStatusLabel, type Order } from './orders.api';
 
 export default function OrdersPage() {
+  const [searchParams] = useSearchParams();
+  const webpayResult = searchParams.get('webpay');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +23,7 @@ export default function OrdersPage() {
     <main className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
       <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Tu cuenta</p>
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Mis pedidos</h1>
+      {webpayResult === 'review' && <p aria-live="polite" className="mt-5 rounded-xl bg-amber-50 p-5 text-amber-900">No pudimos reconocer el retorno de Webpay. Abre un pedido y actualiza su estado.</p>}
       {loading && <p className="py-12 text-center text-slate-600">Cargando tus pedidos…</p>}
       {!loading && error && <p className="mt-6 rounded-xl bg-red-50 p-5 text-red-800">{error}</p>}
       {!loading && !error && orders.length === 0 && (

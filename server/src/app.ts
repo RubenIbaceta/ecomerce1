@@ -7,6 +7,7 @@ import { productRouter } from './modules/products/product.routes.ts';
 import { authRouter } from './modules/auth/auth.routes.ts';
 import { cartRouter } from './modules/cart/cart.routes.ts';
 import { ordersRouter } from './modules/orders/orders.routes.ts';
+import { paymentsRouter } from './modules/payments/payments.routes.ts';
 import { requireAuth, requireRole } from './middleware/auth.ts';
 
 dotenv.config({ path: new URL('../../.env', import.meta.url) });
@@ -17,6 +18,7 @@ export function createApp() {
   app.disable('x-powered-by');
   if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
   app.use(express.json());
+  app.use(express.urlencoded({ extended: false, limit: '16kb' }));
   const sessionSecret = process.env.SESSION_SECRET;
   const databaseUrl = process.env.DATABASE_URL;
   if (!sessionSecret || sessionSecret.length < 32 || !databaseUrl) {
@@ -54,6 +56,7 @@ export function createApp() {
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/cart', cartRouter);
   app.use('/api/v1/orders', ordersRouter);
+  app.use('/api/v1', paymentsRouter);
   app.get('/api/v1/admin/access', requireAuth, requireRole('ADMIN'), (_request, response) => {
     response.json({ data: { access: 'admin' } });
   });

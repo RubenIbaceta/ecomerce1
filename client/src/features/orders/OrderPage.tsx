@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { formatPrice } from '../catalog/catalog.api';
-import { cancelOrder, fetchOrder, orderStatusLabel, payDemoOrder, type Order } from './orders.api';
+import { cancelOrder, fetchOrder, orderStatusLabel, payDemoOrder, startWebpayPayment, type Order } from './orders.api';
 
 export default function OrderPage() {
   const { orderId = '' } = useParams();
+  const [searchParams] = useSearchParams();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const webpayResult = searchParams.get('webpay');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -48,6 +50,27 @@ export default function OrderPage() {
     }
   }
 
+  async function payWithWebpay() {
+    setBusy(true);
+    setError(null);
+    try {
+      const checkout = await startWebpayPayment(orderId);
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = checkout.url;
+      const token = document.createElement('input');
+      token.type = 'hidden';
+      token.name = 'token_ws';
+      token.value = checkout.token;
+      form.append(token);
+      document.body.append(form);
+      form.submit();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No fue posible iniciar Webpay.');
+      setBusy(false);
+    }
+  }
+
   return (
     <main className="mx-auto max-w-4xl px-6 py-10 sm:py-14">
       <Link className="text-sm font-medium text-blue-700 hover:underline" to="/pedidos">← Volver a mis pedidos</Link>
@@ -63,12 +86,18 @@ export default function OrderPage() {
             <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">{orderStatusLabel(order.status)}</span>
           </div>
           {error && <p aria-live="polite" className="mt-5 rounded-lg bg-red-50 p-4 text-sm text-red-800">{error}</p>}
+          {webpayResult === 'paid' && <p aria-live="polite" className="mt-6 rounded-xl bg-green-50 p-5 text-green-800">Webpay confirmó el pago en ambiente de pruebas.</p>}
+          {webpayResult === 'failed' && <p aria-live="polite" className="mt-6 rounded-xl bg-amber-50 p-5 text-amber-900">El pago no fue aprobado o se canceló en Webpay. Se liberó la reserva de stock.</p>}
+          {webpayResult === 'review' && <p aria-live="polite" className="mt-6 rounded-xl bg-amber-50 p-5 text-amber-900">No pudimos confirmar el resultado con Webpay. Actualiza el pedido antes de volver a intentarlo.</p>}
           {order.status === 'PENDING_PAYMENT' && (
             <section className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-5">
-              <p className="text-sm leading-6 text-blue-950">Pago de demostración: no se realizará ningún cobro. La reserva vence el {new Date(order.reservationExpiresAt).toLocaleString('es-CL')}.</p>
+              <p className="text-sm leading-6 text-blue-950">Webpay está en ambiente de integración. Usa datos de prueba de Transbank; no hay cobros reales. La reserva vence el {new Date(order.reservationExpiresAt).toLocaleString('es-CL')}.</p>
               <div className="mt-4 flex flex-wrap gap-3">
+                <button className="rounded-lg bg-blue-700 px-5 py-2.5 font-semibold text-white hover:bg-blue-800 disabled:opacity-60" disabled={busy} onClick={() => void payWithWebpay()} type="button">
+                  {busy ? 'Conectando…' : 'Pagar con Webpay (prueba)'}
+                </button>
                 <button className="rounded-lg bg-blue-700 px-5 py-2.5 font-semibold text-white hover:bg-blue-800 disabled:opacity-60" disabled={busy} onClick={() => void pay()} type="button">
-                  {busy ? 'Procesando…' : 'Pagar en modo demo'}
+                  {busy ? 'Procesando…' : 'Aprobar pago simulado'}
                 </button>
                 <button className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60" disabled={busy} onClick={() => void cancel()} type="button">
                   Cancelar pedido

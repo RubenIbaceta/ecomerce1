@@ -80,6 +80,14 @@ export async function payDemoOrder(orderId: string) {
   return readOrderResponse<Order>(response);
 }
 
+export async function startWebpayPayment(orderId: string) {
+  const response = await fetch('/api/v1/orders/' + encodeURIComponent(orderId) + '/payments/webpay', {
+    method: 'POST',
+    credentials: 'same-origin',
+  });
+  return readOrderResponse<{ url: string; token: string }>(response);
+}
+
 export async function cancelOrder(orderId: string) {
   const response = await fetch('/api/v1/orders/' + encodeURIComponent(orderId) + '/cancel', {
     method: 'POST',
