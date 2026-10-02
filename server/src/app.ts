@@ -6,6 +6,7 @@ import { categoryRouter } from './modules/categories/category.routes.ts';
 import { productRouter } from './modules/products/product.routes.ts';
 import { authRouter } from './modules/auth/auth.routes.ts';
 import { cartRouter } from './modules/cart/cart.routes.ts';
+import { ordersRouter } from './modules/orders/orders.routes.ts';
 import { requireAuth, requireRole } from './middleware/auth.ts';
 
 dotenv.config({ path: new URL('../../.env', import.meta.url) });
@@ -52,6 +53,7 @@ export function createApp() {
   app.use('/api/v1/categories', categoryRouter);
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/cart', cartRouter);
+  app.use('/api/v1/orders', ordersRouter);
   app.get('/api/v1/admin/access', requireAuth, requireRole('ADMIN'), (_request, response) => {
     response.json({ data: { access: 'admin' } });
   });

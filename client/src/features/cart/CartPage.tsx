@@ -7,6 +7,7 @@ export default function CartPage() {
   const { cart, loading, error, updateQuantity, removeItem } = useCart();
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyItem, setBusyItem] = useState<string | null>(null);
+  const hasUnavailableItems = cart?.items.some((item) => !item.available) ?? false;
 
   async function update(itemId: string, quantity: number) {
     setBusyItem(itemId);
@@ -86,7 +87,11 @@ export default function CartPage() {
               <span>Subtotal</span>
               <span>{formatPrice(cart.subtotalClp)}</span>
             </div>
-            <p className="mt-3 text-xs leading-5 text-slate-500">El envío y el pago se calcularán en la siguiente fase.</p>
+            <p className="mt-3 text-xs leading-5 text-slate-500">Envío gratis de demostración. El pago no generará un cobro real.</p>
+            {hasUnavailableItems && <p className="mt-3 text-sm text-red-700">Ajusta los productos sin stock antes de continuar.</p>}
+            <Link aria-disabled={hasUnavailableItems} className={'mt-5 inline-flex w-full justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white ' + (hasUnavailableItems ? 'pointer-events-none bg-slate-400' : 'bg-blue-700 hover:bg-blue-800')} to="/checkout" tabIndex={hasUnavailableItems ? -1 : undefined}>
+              Continuar al checkout
+            </Link>
             <Link className="mt-5 inline-flex w-full justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50" to="/catalogo">
               Seguir comprando
             </Link>

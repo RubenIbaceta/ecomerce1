@@ -1,0 +1,90 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { requireAuth } from '../../middleware/auth.ts';
+import { cancelOrder, createOrder, getOrder, listOrders, payDemoOrder } from './orders.service.ts';
+
+export const ordersRouter = Router();
+
+const checkoutSchema = z.object({
+  recipientName: z.string().trim().min(2).max(100),
+  phone: z.string().trim().min(8).max(20).regex(/^[+0-9 ()-]+$/),
+  address: z.string().trim().min(5).max(200),
+  commune: z.string().trim().min(2).max(80),
+  region: z.string().trim().min(2).max(80),
+});
+
+ordersRouter.use(requireAuth);
+
+function orderIdFromRequest(value: string) {
+  return z.string().uuid().safeParse(value);
+}
+
+ordersRouter.post('/', async (request, response, next) => {
+  const parsed = checkoutSchema.safeParse(request.body);
+  if (!parsed.success) {
+    response.status(400).json({
+      error: {
+        code: 'INVALID_CHECKOUT',
+        message: 'Revisa el nombre, teléfono y dirección de entrega.',
+      },
+    });
+    return;
+  }
+  try {
+    response.status(201).json({ data: await createOrder(request.currentUser!.id, parsed.data) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+ordersRouter.get('/', async (request, response, next) => {
+  try {
+    response.json({ data: await listOrders(request.currentUser!.id) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+ordersRouter.post('/:orderId/payments/demo', async (request, response, next) => {
+  const parsedId = orderIdFromRequest(request.params.orderId);
+  if (!parsedId.success) {
+    response.status(400).json({ error: { code: 'INVALID_ORDER_ID', message: 'El número de pedido no es válido.' } });
+    return;
+  }
+  try {
+    response.json({ data: await payDemoOrder(request.currentUser!.id, parsedId.data) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+ordersRouter.post('/:orderId/cancel', async (request, response, next) => {
+  const parsedId = orderIdFromRequest(request.params.orderId);
+  if (!parsedId.success) {
+    response.status(400).json({ error: { code: 'INVALID_ORDER_ID', message: 'El número de pedido no es válido.' } });
+    return;
+  }
+  try {
+    response.json({ data: await cancelOrder(request.currentUser!.id, parsedId.data) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+ordersRouter.get('/:orderId', async (request, response, next) => {
+  const parsedId = orderIdFromRequest(request.params.orderId);
+  if (!parsedId.success) {
+    response.status(400).json({ error: { code: 'INVALID_ORDER_ID', message: 'El número de pedido no es válido.' } });
+    return;
+  }
+  try {
+    const order = await getOrder(request.currentUser!.id, parsedId.data);
+    if (!order) {
+      response.status(404).json({ error: { code: 'ORDER_NOT_FOUND', message: 'No encontramos ese pedido.' } });
+      return;
+    }
+    response.json({ data: order });
+  } catch (error) {
+    next(error);
+  }
+});

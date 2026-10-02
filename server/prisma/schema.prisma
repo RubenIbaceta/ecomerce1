@@ -12,6 +12,26 @@ enum UserRole {
   ADMIN
 }
 
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  CANCELLED
+  PREPARING
+  SHIPPED
+  COMPLETED
+}
+
+enum PaymentProvider {
+  DEMO
+  WEBPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   name         String
@@ -22,6 +42,7 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   cart         Cart?
+  orders       Order[]
 
   @@map("users")
 }
@@ -49,6 +70,65 @@ model CartItem {
 
   @@unique([cartId, productId])
   @@map("cart_items")
+}
+
+model Order {
+  id                  String      @id @default(uuid()) @db.Uuid
+  orderNumber         String      @unique @map("order_number")
+  userId              String      @map("user_id") @db.Uuid
+  user                User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  status              OrderStatus @default(PENDING_PAYMENT)
+  subtotalClp         Int         @map("subtotal_clp")
+  shippingClp         Int         @default(0) @map("shipping_clp")
+  totalClp            Int         @map("total_clp")
+  recipientName       String      @map("recipient_name")
+  phone               String
+  address             String
+  commune             String
+  region              String
+  reservationExpiresAt DateTime   @map("reservation_expires_at")
+  paidAt              DateTime?   @map("paid_at")
+  cancelledAt         DateTime?   @map("cancelled_at")
+  items               OrderItem[]
+  payments            Payment[]
+  createdAt           DateTime    @default(now()) @map("created_at")
+  updatedAt           DateTime    @updatedAt @map("updated_at")
+
+  @@index([userId, createdAt])
+  @@index([status, reservationExpiresAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String   @id @default(uuid()) @db.Uuid
+  orderId      String   @map("order_id") @db.Uuid
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String   @map("product_id") @db.Uuid
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  sku          String
+  productName  String   @map("product_name")
+  unitPriceClp Int      @map("unit_price_clp")
+  quantity     Int
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Payment {
+  id                    String          @id @default(uuid()) @db.Uuid
+  orderId               String          @map("order_id") @db.Uuid
+  order                 Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider              PaymentProvider
+  status                PaymentStatus
+  reference             String          @unique
+  amountClp             Int             @map("amount_clp")
+  responseCode          String?         @map("response_code")
+  authorizedAt          DateTime?       @map("authorized_at")
+  createdAt             DateTime        @default(now()) @map("created_at")
+
+  @@index([orderId, createdAt])
+  @@map("payments")
 }
 
 model UserSession {
@@ -86,6 +166,7 @@ model Product {
   imageUrl    String?  @map("image_url")
   isActive    Boolean  @default(true) @map("is_active")
   cartItems   CartItem[]
+  orderItems  OrderItem[]
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 

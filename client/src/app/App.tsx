@@ -9,6 +9,9 @@ import ProtectedRoute from '../features/auth/ProtectedRoute';
 import RegisterPage from '../features/auth/RegisterPage';
 import CartPage from '../features/cart/CartPage';
 import { CartProvider, useCart } from '../features/cart/CartContext';
+import CheckoutPage from '../features/orders/CheckoutPage';
+import OrderPage from '../features/orders/OrderPage';
+import OrdersPage from '../features/orders/OrdersPage';
 
 function HomePage() {
   return (
@@ -20,7 +23,7 @@ function HomePage() {
         Tecnología para lo que viene.
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-        Una tienda demo de hardware para PC. Explora el catálogo y guarda productos en tu carrito; el proceso de compra llegará en una próxima fase.
+        Una tienda demo de hardware para PC. Explora el catálogo, arma tu carrito y sigue tus pedidos.
       </p>
       <div className="mt-10">
         <Link
@@ -66,6 +69,7 @@ function AppContent() {
                   <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/carrito">
                     Carrito{cart && cart.itemCount > 0 ? ' (' + cart.itemCount + ')' : ''}
                   </Link>
+                  <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/pedidos">Mis pedidos</Link>
                   <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/perfil">Mi cuenta</Link>
                   <button
                     className="text-sm font-medium text-slate-700 hover:text-blue-700"
@@ -94,6 +98,9 @@ function AppContent() {
         <Route element={<ProtectedRoute />} >
           <Route element={<ProfilePage />} path="/perfil" />
           <Route element={<CartPage />} path="/carrito" />
+          <Route element={<CheckoutPage />} path="/checkout" />
+          <Route element={<OrdersPage />} path="/pedidos" />
+          <Route element={<OrderPage />} path="/pedidos/:orderId" />
         </Route>
         <Route element={<ProtectedRoute role="ADMIN" />}>
           <Route element={<AdminPage />} path="/admin" />

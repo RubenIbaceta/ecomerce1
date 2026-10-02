@@ -18,6 +18,9 @@ E-commerce de práctica de una tienda de **hardware y tecnología para PC**, des
 - Área de administración protegida por rol.
 - Contraseñas almacenadas con hash scrypt; nunca en texto plano.
 - Carrito persistente por cuenta, con cantidades y subtotal calculado por la API.
+- Checkout con datos de entrega e historial de pedidos.
+- Reserva transaccional de stock, vencimiento/liberación de reservas y pago simulado sin cobros reales.
+- Los pedidos guardan copias históricas de SKU, nombre y precio de cada producto.
 - Catálogo de productos
 - Categorías
 - Búsqueda y filtros
