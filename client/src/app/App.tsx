@@ -7,6 +7,8 @@ import LoginPage from '../features/auth/LoginPage';
 import ProfilePage from '../features/auth/ProfilePage';
 import ProtectedRoute from '../features/auth/ProtectedRoute';
 import RegisterPage from '../features/auth/RegisterPage';
+import CartPage from '../features/cart/CartPage';
+import { CartProvider, useCart } from '../features/cart/CartContext';
 
 function HomePage() {
   return (
@@ -18,7 +20,7 @@ function HomePage() {
         Tecnología para lo que viene.
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-        Una tienda demo de hardware para PC. Ya puedes explorar el catálogo; el carrito y las compras llegarán en las siguientes fases.
+        Una tienda demo de hardware para PC. Explora el catálogo y guarda productos en tu carrito; el proceso de compra llegará en una próxima fase.
       </p>
       <div className="mt-10">
         <Link
@@ -45,6 +47,7 @@ function NotFoundPage() {
 
 function AppContent() {
   const { user, loading, signOut } = useAuth();
+  const { cart } = useCart();
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -60,6 +63,9 @@ function AppContent() {
               </Link>
               {!loading && (user ? (
                 <>
+                  <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/carrito">
+                    Carrito{cart && cart.itemCount > 0 ? ' (' + cart.itemCount + ')' : ''}
+                  </Link>
                   <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/perfil">Mi cuenta</Link>
                   <button
                     className="text-sm font-medium text-slate-700 hover:text-blue-700"
@@ -87,6 +93,7 @@ function AppContent() {
         <Route element={<RegisterPage />} path="/registro" />
         <Route element={<ProtectedRoute />} >
           <Route element={<ProfilePage />} path="/perfil" />
+          <Route element={<CartPage />} path="/carrito" />
         </Route>
         <Route element={<ProtectedRoute role="ADMIN" />}>
           <Route element={<AdminPage />} path="/admin" />
@@ -102,6 +109,11 @@ function AppContent() {
   );
 }
 
+function CartEnabledApp() {
+  const { user } = useAuth();
+  return <CartProvider key={user?.id ?? 'anonymous'}><AppContent /></CartProvider>;
+}
+
 export default function App() {
-  return <AuthProvider><AppContent /></AuthProvider>;
+  return <AuthProvider><CartEnabledApp /></AuthProvider>;
 }

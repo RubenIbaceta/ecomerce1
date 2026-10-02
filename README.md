@@ -17,6 +17,7 @@ E-commerce de práctica de una tienda de **hardware y tecnología para PC**, des
 - Sesiones persistidas en PostgreSQL.
 - Área de administración protegida por rol.
 - Contraseñas almacenadas con hash scrypt; nunca en texto plano.
+- Carrito persistente por cuenta, con cantidades y subtotal calculado por la API.
 - Catálogo de productos
 - Categorías
 - Búsqueda y filtros
