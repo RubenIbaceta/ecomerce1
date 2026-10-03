@@ -67,13 +67,14 @@ function startOfLocalPeriod(now: Date, period: 'today' | 'week' | 'month') {
 
 export async function getAdminDashboard() {
   const now = new Date();
+  const confirmedStatuses: OrderStatus[] = ['PAID', 'PREPARING', 'SHIPPED', 'COMPLETED'];
   const periods = {
     today: startOfLocalPeriod(now, 'today'),
     week: startOfLocalPeriod(now, 'week'),
     month: startOfLocalPeriod(now, 'month'),
   };
-  const confirmedOrderWhere = (start: Date) => ({
-    status: { in: ['PAID', 'PREPARING', 'SHIPPED', 'COMPLETED'] as const },
+  const confirmedOrderWhere = (start: Date): Prisma.OrderWhereInput => ({
+    status: { in: confirmedStatuses },
     paidAt: { gte: start, lte: now },
     payments: { some: { status: 'APPROVED' as const } },
     returnRequest: { isNot: { status: 'REFUNDED' as const } },
@@ -94,7 +95,7 @@ export async function getAdminDashboard() {
     }),
     prisma.orderItem.groupBy({
       by: ['productId'],
-      where: { order: { status: { in: ['PAID', 'PREPARING', 'SHIPPED', 'COMPLETED'] }, paidAt: { gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), lte: now }, payments: { some: { status: 'APPROVED' } }, returnRequest: { isNot: { status: 'REFUNDED' } } } },
+      where: { order: { status: { in: confirmedStatuses }, paidAt: { gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), lte: now }, payments: { some: { status: 'APPROVED' } }, returnRequest: { isNot: { status: 'REFUNDED' } } } },
       _sum: { quantity: true },
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5,
