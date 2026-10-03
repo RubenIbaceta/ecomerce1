@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { fetchProduct, formatPrice, type Product } from './catalog.api';
 import { useAuth } from '../auth/AuthContext';
 import { useCart } from '../cart/CartContext';
+import { StoreIcon } from '../../app/StoreIcon';
 
 function specificationRows(value: string) {
   return value.split('\n').map((line) => line.trim()).filter(Boolean).map((line) => {
@@ -61,16 +62,16 @@ export default function ProductPage() {
       {loading && <p className="py-16 text-center text-slate-600">Cargando producto…</p>}
       {!loading && error && <div role="alert" className="mt-8 rounded-xl bg-red-50 p-5 text-red-800"><p>{error}</p><button className="mt-3 rounded-lg border border-red-300 px-4 py-2 font-semibold" onClick={() => setReload((value) => value + 1)} type="button">Reintentar</button></div>}
       {!loading && !error && product && (
-        <article className="mt-7 grid overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm md:grid-cols-2">
-          <div className="flex min-h-80 items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-8 sm:min-h-[480px]">
-            {product.imageUrl ? <img alt={product.name} className="h-full max-h-[560px] w-full object-contain" src={product.imageUrl} /> : <span aria-hidden="true" className="grid size-28 place-items-center rounded-full bg-blue-50 text-7xl text-blue-700">✦</span>}
+        <article className="surface-card mt-7 grid overflow-hidden rounded-[1.5rem] md:grid-cols-2">
+          <div className="flex min-h-80 items-center justify-center bg-[#f0e9df] p-8 sm:min-h-[480px]">
+            {product.imageUrl ? <img alt={product.name} className="h-full max-h-[560px] w-full object-contain transition duration-500 hover:scale-[1.025]" src={product.imageUrl} /> : <span aria-hidden="true" className="grid size-28 place-items-center rounded-full bg-[var(--color-brand-soft)] text-[var(--color-brand)]"><StoreIcon className="size-12" name="product" /></span>}
           </div>
           <div className="p-6 sm:p-9 lg:p-12">
-            <p className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-blue-800">{product.category.name}</p>
-            <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{product.name}</h1>
+            <p className="inline-flex border-l-2 border-[var(--color-brand)] pl-3 text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-brand)]">{product.category.name}</p>
+            <h1 className="mt-4 text-4xl font-bold tracking-tight text-[var(--color-ink)] sm:text-5xl">{product.name}</h1>
             <div className="mt-6 space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Precio Webpay</p>
-              <p className="text-3xl font-black tracking-tight text-slate-950">{formatPrice(product.priceClp)}</p>
+              <p className="text-4xl font-black tracking-tight text-[var(--color-ink)]">{formatPrice(product.priceClp)}</p>
               {product.transferPriceClp !== null
                 ? <p className="text-sm text-slate-700">Transferencia / depósito: <strong>{formatPrice(product.transferPriceClp)}</strong></p>
                 : <p className="text-sm text-slate-500">Transferencia / depósito: precio por consultar.</p>}
@@ -90,12 +91,12 @@ export default function ProductPage() {
               </section>
             </div>
             {product.stock > 0 && user && (
-              <button className="mt-7 block w-full rounded-xl bg-[var(--color-brand)] px-5 py-3.5 font-bold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-wait disabled:opacity-60 sm:w-auto sm:min-w-56" disabled={adding} onClick={() => void addToCart()} type="button">
+              <button className="mt-7 block w-full rounded-full bg-[var(--color-brand)] px-6 py-3.5 font-bold text-white shadow-sm transition hover:bg-[var(--color-brand-dark)] disabled:cursor-wait disabled:opacity-60 sm:w-auto sm:min-w-56" disabled={adding} onClick={() => void addToCart()} type="button">
                 {adding ? 'Agregando…' : 'Agregar al carrito'}
               </button>
             )}
             {product.stock > 0 && !user && !authLoading && (
-              <Link className="mt-7 inline-flex rounded-xl bg-[var(--color-brand)] px-5 py-3.5 font-bold text-white transition hover:bg-blue-800" to="/ingresar">
+              <Link className="mt-7 inline-flex rounded-full bg-[var(--color-brand)] px-6 py-3.5 font-bold text-white transition hover:bg-[var(--color-brand-dark)]" to="/ingresar">
                 Inicia sesión para agregar
               </Link>
             )}

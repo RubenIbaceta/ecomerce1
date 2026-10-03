@@ -124,10 +124,11 @@ export default function OrderPage() {
       {!loading && error && !order && <p className="mt-6 rounded-xl bg-red-50 p-5 text-red-800">{error}</p>}
       {!loading && order && (
         <>
-          <div className="mt-6 flex flex-wrap items-end justify-between gap-4 rounded-3xl bg-[var(--color-ink)] p-6 text-white sm:p-8">
+          <div className="relative mt-6 flex flex-wrap items-end justify-between gap-4 overflow-hidden rounded-[1.5rem] bg-[var(--color-deep)] p-6 text-white shadow-[0_22px_50px_rgb(71_39_34/12%)] sm:p-8">
+            <span aria-hidden="true" className="absolute -right-12 -top-20 size-52 rounded-full border-[30px] border-white/5" />
             <div>
-              <p className="text-sm font-bold uppercase tracking-wide text-blue-200">Pedido</p>
-              <h1 className="mt-2 text-3xl font-black">{order.orderNumber}</h1>
+              <p className="border-l-2 border-[#ef7777] pl-3 text-xs font-bold uppercase tracking-[0.14em] text-[#f4cfcc]">Pedido</p>
+              <h1 className="mt-3 text-4xl font-bold">{order.orderNumber}</h1>
             </div>
             <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white">{orderStatusLabel(order.status)}</span>
           </div>
@@ -139,7 +140,7 @@ export default function OrderPage() {
             <section className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-5 sm:p-6">
               <p className="text-sm leading-6 text-blue-950">Completa el pago con Webpay. La reserva de productos vence el {new Date(order.reservationExpiresAt).toLocaleString('es-CL')}.</p>
               <div className="mt-4 flex flex-wrap gap-3">
-                <button className="rounded-xl bg-[var(--color-brand)] px-5 py-3 font-bold text-white transition hover:bg-blue-800 disabled:opacity-60" disabled={busy} onClick={() => void payWithWebpay()} type="button">
+                <button className="rounded-full bg-[var(--color-brand)] px-5 py-3 font-bold text-white transition hover:bg-[var(--color-brand-dark)] disabled:opacity-60" disabled={busy} onClick={() => void payWithWebpay()} type="button">
                   {busy ? 'Conectando…' : 'Pagar con Webpay'}
                 </button>
                 <button className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60" disabled={busy} onClick={() => void cancel()} type="button">
@@ -153,7 +154,7 @@ export default function OrderPage() {
           {!['CANCELLED', 'PENDING_PAYMENT'].includes(order.status) && <section aria-label="Seguimiento del pedido" className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="font-bold text-slate-950">Seguimiento</h2><ol className="mt-4 grid gap-3 sm:grid-cols-4">{(['PAID', 'PREPARING', 'SHIPPED', 'COMPLETED'] as const).map((step, index) => { const current = ['PAID', 'PREPARING', 'SHIPPED', 'COMPLETED'].indexOf(order.status); const reached = index <= current; return <li className={`rounded-xl border p-3 ${reached ? 'border-blue-200 bg-blue-50' : 'border-slate-200 bg-slate-50'}`} key={step}><p className={`text-sm font-bold ${reached ? 'text-blue-900' : 'text-slate-500'}`}>{['Pago confirmado', 'En preparación', 'Enviado', 'Entregado'][index]}</p><p className="mt-1 text-xs text-slate-500">{index < current ? 'Completado' : index === current ? 'Estado actual' : 'Pendiente'}</p></li>; })}</ol><p className="mt-3 text-xs text-slate-500">Seguimiento interno asociado al pedido {order.orderNumber}; el estado lo actualiza la administración.</p></section>}
           {order.returnRequest ? <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5"><h2 className="font-bold text-slate-950">Solicitud de devolución</h2><p className="mt-2 text-sm text-slate-700">Estado: <strong>{{ REQUESTED: 'En revisión', PROCESSING: 'Reembolso en proceso', REFUNDED: 'Reembolso registrado', REJECTED: 'Solicitud rechazada' }[order.returnRequest.status]}</strong></p><p className="mt-1 text-sm text-slate-600">Motivo: {order.returnRequest.reason}</p>{order.returnRequest.adminNote && <p className="mt-2 text-xs text-slate-500">{order.returnRequest.adminNote}</p>}</section> : order.paidAt && ['PAID', 'PREPARING', 'SHIPPED', 'COMPLETED'].includes(order.status) && Date.now() - new Date(order.paidAt).getTime() <= 30 * 24 * 60 * 60 * 1000 && <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5"><h2 className="font-bold text-slate-950">¿Necesitas devolver tu compra?</h2><p className="mt-1 text-sm text-slate-600">Puedes solicitar una devolución dentro de los 30 días desde el pago. La tienda revisará el caso antes de procesar el reembolso.</p>{returnFormOpen ? <form className="mt-4 space-y-3" onSubmit={(event) => void submitReturn(event)}><label className="block text-sm font-medium text-slate-700">Motivo<textarea className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 font-normal" maxLength={1000} minLength={10} onChange={(event) => setReturnReason(event.target.value)} required rows={3} value={returnReason} /></label><div className="flex gap-3"><button className="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" disabled={busy} type="submit">{busy ? 'Enviando…' : 'Enviar solicitud'}</button><button className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold" onClick={() => setReturnFormOpen(false)} type="button">Cancelar</button></div></form> : <button className="mt-4 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-blue-700" onClick={() => setReturnFormOpen(true)} type="button">Solicitar devolución</button>}<p className="mt-3 text-xs text-slate-500">El inventario solo se actualiza después de recibir y revisar el producto.</p></section>}
           <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_21rem]">
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <section className="surface-card rounded-xl p-5 sm:p-6">
               <h2 className="text-lg font-bold text-slate-950">Productos</h2>
               <ul className="mt-4 divide-y divide-slate-100">
                 {order.items.map((item) => (
@@ -167,7 +168,7 @@ export default function OrderPage() {
                 ))}
               </ul>
             </section>
-            <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <aside className="surface-card h-fit rounded-xl p-5 sm:p-6">
               <h2 className="text-lg font-bold text-slate-950">Entrega y total</h2>
               <p className="mt-4 font-medium text-slate-800">{order.recipientName}</p>
               <p className="mt-1 text-sm leading-6 text-slate-600">{order.address}, {order.commune}, {order.region}<br />{order.phone}</p>

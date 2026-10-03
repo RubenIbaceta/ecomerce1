@@ -24,8 +24,8 @@ export default function OrdersPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-      <p className="text-sm font-bold uppercase tracking-wide text-[var(--color-brand)]">Tu cuenta</p>
-      <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Mis pedidos</h1>
+      <p className="border-l-2 border-[var(--color-brand)] pl-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-brand)]">Tu cuenta</p>
+      <h1 className="mt-3 text-4xl font-bold tracking-tight text-[var(--color-ink)] sm:text-5xl">Mis pedidos</h1>
       <p className="mt-3 text-sm text-slate-600">Revisa los detalles y el estado de tus compras.</p>
       {webpayResult === 'review' && <p aria-live="polite" className="mt-5 rounded-xl bg-amber-50 p-5 text-amber-900">No pudimos reconocer el retorno de Webpay. Abre un pedido y actualiza su estado.</p>}
       {loading && <p className="py-12 text-center text-slate-600">Cargando tus pedidos…</p>}
@@ -37,9 +37,9 @@ export default function OrdersPage() {
         </section>
       )}
       {!loading && !error && orders.length > 0 && (
-        <div className="mt-7 space-y-4">
+        <div className="reveal-grid mt-7 space-y-4">
           {orders.map((order) => (
-            <Link className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md" key={order.id} to={'/pedidos/' + order.id}>
+            <Link className="surface-card flex flex-wrap items-center justify-between gap-4 rounded-xl p-5 transition hover:-translate-y-0.5 hover:border-red-300 hover:shadow-md" key={order.id} to={'/pedidos/' + order.id}>
               <div>
                 <p className="font-semibold text-slate-950">{order.orderNumber}</p>
                 <p className="mt-1 text-sm text-slate-500">{new Date(order.createdAt).toLocaleString('es-CL')}</p>

@@ -324,19 +324,19 @@ export default function AdminPage() {
 
   return (
     <main className="admin-page mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-      <p className="text-sm font-bold uppercase tracking-wide text-[var(--color-brand)]">Acceso protegido</p>
-      <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Administración</h1>
+      <p className="border-l-2 border-[var(--color-brand)] pl-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-brand)]">Acceso protegido</p>
+      <h1 className="mt-3 text-4xl font-bold tracking-tight text-[var(--color-ink)] sm:text-5xl">Administración</h1>
       <p className="mt-2 max-w-2xl leading-6 text-slate-600">Administra el catálogo, el stock y el estado de los pedidos.</p>
 
-      <div className="mt-7 flex flex-wrap gap-3 border-b border-slate-200" role="tablist" aria-label="Secciones de administración">
-        <button aria-selected={tab === 'dashboard'} className={'border-b-2 px-3 py-3 text-sm font-semibold ' + (tab === 'dashboard' ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-600')} onClick={() => setTab('dashboard')} role="tab" type="button">Resumen</button>
-        <button aria-selected={tab === 'sales'} className={'border-b-2 px-3 py-3 text-sm font-semibold ' + (tab === 'sales' ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-600')} onClick={() => setTab('sales')} role="tab" type="button">Ventas confirmadas ({confirmedOrders.length})</button>
-        <button aria-selected={tab === 'pending'} className={'border-b-2 px-3 py-3 text-sm font-semibold ' + (tab === 'pending' ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-600')} onClick={() => setTab('pending')} role="tab" type="button">Pedidos pendientes ({dashboard?.pendingOrderCount ?? pendingOrders.length})</button>
-        <button aria-selected={tab === 'low-stock'} className={'border-b-2 px-3 py-3 text-sm font-semibold ' + (tab === 'low-stock' ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-600')} onClick={() => setTab('low-stock')} role="tab" type="button">Stock bajo ({dashboard?.lowStockCount ?? 0})</button>
-        <button aria-selected={tab === 'returns'} className={'border-b-2 px-3 py-3 text-sm font-semibold ' + (tab === 'returns' ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-600')} onClick={() => setTab('returns')} role="tab" type="button">Devoluciones ({returnRequests.filter((request) => request.status === 'REQUESTED').length})</button>
-        <button aria-selected={tab === 'products'} className={'border-b-2 px-3 py-3 text-sm font-semibold ' + (tab === 'products' ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-600')} onClick={() => setTab('products')} role="tab" type="button">Productos</button>
-        <button aria-selected={tab === 'orders'} className={'border-b-2 px-3 py-3 text-sm font-semibold ' + (tab === 'orders' ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-600')} onClick={() => setTab('orders')} role="tab" type="button">Pedidos ({orders.length})</button>
-        <button aria-selected={tab === 'users'} className={'border-b-2 px-3 py-3 text-sm font-semibold ' + (tab === 'users' ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-600')} onClick={() => setTab('users')} role="tab" type="button">Cuentas ({userPagination.total})</button>
+      <div className="mt-7 flex flex-wrap gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] p-2 shadow-sm" role="tablist" aria-label="Secciones de administración">
+        <button aria-selected={tab === 'dashboard'} className={'rounded-lg px-3 py-2.5 text-sm font-semibold ' + (tab === 'dashboard' ? 'bg-[var(--color-brand)] text-white shadow-sm' : 'text-slate-600 hover:bg-red-50')} onClick={() => setTab('dashboard')} role="tab" type="button">Resumen</button>
+        <button aria-selected={tab === 'sales'} className={'rounded-lg px-3 py-2.5 text-sm font-semibold ' + (tab === 'sales' ? 'bg-[var(--color-brand)] text-white shadow-sm' : 'text-slate-600 hover:bg-red-50')} onClick={() => setTab('sales')} role="tab" type="button">Ventas confirmadas ({confirmedOrders.length})</button>
+        <button aria-selected={tab === 'pending'} className={'rounded-lg px-3 py-2.5 text-sm font-semibold ' + (tab === 'pending' ? 'bg-[var(--color-brand)] text-white shadow-sm' : 'text-slate-600 hover:bg-red-50')} onClick={() => setTab('pending')} role="tab" type="button">Pedidos pendientes ({dashboard?.pendingOrderCount ?? pendingOrders.length})</button>
+        <button aria-selected={tab === 'low-stock'} className={'rounded-lg px-3 py-2.5 text-sm font-semibold ' + (tab === 'low-stock' ? 'bg-[var(--color-brand)] text-white shadow-sm' : 'text-slate-600 hover:bg-red-50')} onClick={() => setTab('low-stock')} role="tab" type="button">Stock bajo ({dashboard?.lowStockCount ?? 0})</button>
+        <button aria-selected={tab === 'returns'} className={'rounded-lg px-3 py-2.5 text-sm font-semibold ' + (tab === 'returns' ? 'bg-[var(--color-brand)] text-white shadow-sm' : 'text-slate-600 hover:bg-red-50')} onClick={() => setTab('returns')} role="tab" type="button">Devoluciones ({returnRequests.filter((request) => request.status === 'REQUESTED').length})</button>
+        <button aria-selected={tab === 'products'} className={'rounded-lg px-3 py-2.5 text-sm font-semibold ' + (tab === 'products' ? 'bg-[var(--color-brand)] text-white shadow-sm' : 'text-slate-600 hover:bg-red-50')} onClick={() => setTab('products')} role="tab" type="button">Productos</button>
+        <button aria-selected={tab === 'orders'} className={'rounded-lg px-3 py-2.5 text-sm font-semibold ' + (tab === 'orders' ? 'bg-[var(--color-brand)] text-white shadow-sm' : 'text-slate-600 hover:bg-red-50')} onClick={() => setTab('orders')} role="tab" type="button">Pedidos ({orders.length})</button>
+        <button aria-selected={tab === 'users'} className={'rounded-lg px-3 py-2.5 text-sm font-semibold ' + (tab === 'users' ? 'bg-[var(--color-brand)] text-white shadow-sm' : 'text-slate-600 hover:bg-red-50')} onClick={() => setTab('users')} role="tab" type="button">Cuentas ({userPagination.total})</button>
       </div>
 
       {error && <p aria-live="polite" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-800">{error}</p>}
@@ -349,7 +349,7 @@ export default function AdminPage() {
           <h2 className="text-xl font-bold text-slate-950">Resumen de ventas confirmadas</h2>
           <p className="mt-1 text-sm text-slate-600">Solo incluye pedidos pagados con al menos un pago aprobado.</p>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {([['today', 'Hoy'], ['week', 'Esta semana'], ['month', 'Este mes']] as const).map(([key, label]) => <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" key={key}>
+            {([['today', 'Hoy'], ['week', 'Esta semana'], ['month', 'Este mes']] as const).map(([key, label]) => <article className="surface-card rounded-xl border-t-2 border-t-[var(--color-brand)] p-5" key={key}>
               <p className="text-sm font-semibold text-slate-600">{label}</p><p className="mt-2 text-2xl font-black text-slate-950">{formatPrice(dashboard?.sales[key].revenueClp ?? 0)}</p><p className="mt-1 text-sm text-slate-500">{dashboard?.sales[key].orderCount ?? 0} pedidos confirmados</p>
             </article>)}
           </div>
@@ -358,7 +358,7 @@ export default function AdminPage() {
           <button className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-left hover:bg-amber-100" onClick={() => setTab('pending')} type="button"><p className="text-sm font-semibold text-amber-900">Pedidos pendientes</p><p className="mt-1 text-3xl font-black text-amber-950">{dashboard?.pendingOrderCount ?? pendingOrders.length}</p><p className="mt-1 text-sm text-amber-800">Pagos o preparación por gestionar</p></button>
           <button className="rounded-2xl border border-rose-200 bg-rose-50 p-5 text-left hover:bg-rose-100" onClick={() => setTab('low-stock')} type="button"><p className="text-sm font-semibold text-rose-900">Productos con stock bajo</p><p className="mt-1 text-3xl font-black text-rose-950">{dashboard?.lowStockCount ?? 0}</p><p className="mt-1 text-sm text-rose-800">Cinco unidades o menos</p></button>
         </div>}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="surface-card rounded-xl p-5">
           <h2 className="text-xl font-bold text-slate-950">Productos más vendidos</h2><p className="mt-1 text-sm text-slate-600">Unidades en pedidos pagados con pago aprobado durante los últimos 30 días.</p>
           {dashboard?.topSellingProducts.length ? <div className="mt-4 divide-y divide-slate-100">{dashboard.topSellingProducts.map((product) => <div className="flex flex-wrap items-center justify-between gap-2 py-3" key={product.id}><div><p className="font-semibold text-slate-900">{product.name}</p><p className="text-xs text-slate-500">SKU {product.sku}</p></div><p className="text-sm text-slate-700"><strong>{product.unitsSold}</strong> vendidos · Stock: <strong>{product.stock}</strong></p></div>)}</div> : <p className="mt-4 text-sm text-slate-600">Aún no hay ventas confirmadas en este periodo.</p>}
         </div>
@@ -373,7 +373,7 @@ export default function AdminPage() {
 
       {!loading && tab === 'products' && (
         <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
-          <form className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" onSubmit={(event) => void submitProduct(event)}>
+          <form className="surface-card space-y-4 rounded-xl p-5 sm:p-6" onSubmit={(event) => void submitProduct(event)}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-950">{editingId ? 'Editar producto' : 'Nuevo producto'}</h2>

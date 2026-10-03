@@ -72,13 +72,14 @@ export default function CatalogPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-      <div className="rounded-3xl bg-[var(--color-ink)] px-6 py-8 text-white sm:px-9 sm:py-10">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-200">Encuentra tu próximo equipo</p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Catálogo</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">Explora los productos disponibles y usa los filtros para encontrar lo que buscas.</p>
+      <div className="relative overflow-hidden rounded-[1.5rem] bg-[var(--color-deep)] px-6 py-9 text-white shadow-[0_22px_50px_rgb(71_39_34/12%)] sm:px-10 sm:py-12">
+        <div aria-hidden="true" className="absolute -right-24 -top-28 size-72 rounded-full border-[42px] border-white/5" />
+        <p className="relative border-l-2 border-[#ef7777] pl-3 text-xs font-bold uppercase tracking-[0.16em] text-[#f4cfcc]">Encuentra tu próximo equipo</p>
+        <h1 className="relative mt-3 text-4xl font-bold tracking-tight sm:text-5xl">Catálogo</h1>
+        <p className="relative mt-3 max-w-2xl text-sm leading-6 text-[#dccdc4]">Compara productos, precios y especificaciones para elegir con toda la información a la vista.</p>
       </div>
 
-      <form key={searchParams.toString()} className="mt-7 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 lg:grid-cols-6 lg:p-6" onSubmit={submitFilters}>
+      <form key={searchParams.toString()} className="surface-card mt-7 grid gap-4 rounded-xl p-5 sm:grid-cols-2 lg:grid-cols-6 lg:p-6" onSubmit={submitFilters}>
         <label className="flex flex-col gap-2 text-sm font-medium text-slate-700 lg:col-span-2">
           Buscar
           <input className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" defaultValue={query} name="q" placeholder="Notebook, audífonos…" />
@@ -108,19 +109,19 @@ export default function CatalogPage() {
           </select>
         </label>
         <div className="flex items-end sm:col-span-2 lg:col-span-6">
-          <button className="w-full rounded-lg bg-[var(--color-brand)] px-5 py-3 font-bold text-white shadow-sm transition hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 sm:w-auto" type="submit">Aplicar filtros</button>
+          <button className="w-full rounded-full bg-[var(--color-brand)] px-6 py-3 font-bold text-white shadow-sm transition hover:bg-[var(--color-brand-dark)] focus-visible:outline-2 focus-visible:outline-offset-2 sm:w-auto" type="submit">Aplicar filtros</button>
         </div>
       </form>
 
       <section aria-live="polite" className="mt-8">
         {categoryError && <p role="status" className="mb-4 rounded-xl bg-amber-50 p-4 text-amber-900">{categoryError} Los filtros de categoría podrían no estar disponibles.</p>}
-        {loading && <p className="py-12 text-center text-slate-600" role="status">Cargando productos…</p>}
+        {loading && <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Cargando productos">{Array.from({ length: 6 }, (_, index) => <div className="surface-card overflow-hidden rounded-xl" key={index}><div className="skeleton aspect-[4/3]" /><div className="space-y-3 p-5"><div className="skeleton h-3 w-1/3 rounded" /><div className="skeleton h-5 w-4/5 rounded" /><div className="skeleton h-4 w-full rounded" /><div className="skeleton h-10 w-1/2 rounded" /></div></div>)}</div>}
         {!loading && error && <div role="alert" className="rounded-xl bg-red-50 p-5 text-red-800"><p>{error}</p><button className="mt-3 rounded-lg border border-red-300 px-4 py-2 font-semibold" onClick={() => setReload((value) => value + 1)} type="button">Reintentar</button></div>}
         {!loading && !error && listing?.data.length === 0 && <div className="rounded-xl bg-white p-8 text-center text-slate-600"><p>No encontramos productos con esos filtros.</p><button className="mt-4 font-semibold text-blue-700 underline" onClick={() => setSearchParams({})} type="button">Limpiar filtros</button></div>}
         {!loading && !error && listing && listing.data.length > 0 && (
           <>
             <p className="mb-4 text-sm text-slate-600">{listing.pagination.total} productos</p>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="reveal-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {listing.data.map((product) => <ProductCard key={product.id} product={product} />)}
             </div>
             {listing.pagination.pages > 1 && (

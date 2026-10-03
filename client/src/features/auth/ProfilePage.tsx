@@ -70,15 +70,15 @@ export default function ProfilePage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <p className="text-sm font-bold uppercase tracking-wide text-[var(--color-brand)]">Mi cuenta</p>
-      <h1 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Hola, {user.name}</h1>
+      <p className="border-l-2 border-[var(--color-brand)] pl-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-brand)]">Mi cuenta</p>
+      <h1 className="mt-3 text-4xl font-bold text-[var(--color-ink)] sm:text-5xl">Hola, {user.name}</h1>
       <p className="mt-3 text-sm text-slate-600">Administra tus datos, direcciones y compras.</p>
       {(error || notice) && <p aria-live="polite" className={`mt-5 rounded-xl p-4 text-sm ${error ? 'bg-red-50 text-red-800' : 'bg-emerald-50 text-emerald-800'}`}>{error || notice}</p>}
 
       <div className="mt-7 grid gap-6 lg:grid-cols-[15rem_1fr]">
-        <nav aria-label="Secciones de mi cuenta" className="h-fit rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <nav aria-label="Secciones de mi cuenta" className="surface-card h-fit rounded-xl p-4 lg:sticky lg:top-44">
           <p className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate-400">Mi perfil</p>
-          <a className="block rounded-lg bg-blue-50 px-3 py-2.5 text-sm font-semibold text-[var(--color-brand)]" href="#datos">Datos personales</a>
+          <a className="block border-l-2 border-[var(--color-brand)] bg-[var(--color-brand-soft)] px-3 py-2.5 text-sm font-semibold text-[var(--color-brand)]" href="#datos">Datos personales</a>
           <a className="mt-1 block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50" href="#direcciones">Direcciones</a>
           <a className="mt-1 block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50" href="#seguridad">Seguridad y contraseña</a>
           <a className="mt-1 block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50" href="#pagos">Pagos</a>

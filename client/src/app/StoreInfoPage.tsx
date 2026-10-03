@@ -71,12 +71,12 @@ function ContactForm() {
     finally { setSending(false); }
   }
 
-  return <form className="mt-7 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7" onSubmit={(event) => void submit(event)}>
+  return <form className="surface-card mt-8 space-y-4 rounded-xl p-5 sm:p-7" onSubmit={(event) => void submit(event)}>
     <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold text-slate-700">Nombre<input autoComplete="name" className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 font-normal" maxLength={100} minLength={2} name="name" required /></label><label className="text-sm font-semibold text-slate-700">Correo<input autoComplete="email" className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 font-normal" maxLength={254} name="email" required type="email" /></label></div>
     <label className="block text-sm font-semibold text-slate-700">Asunto<input className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 font-normal" maxLength={120} minLength={3} name="subject" required /></label>
     <label className="block text-sm font-semibold text-slate-700">Mensaje<textarea className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 font-normal" maxLength={3000} minLength={10} name="message" required rows={5} /></label>
     {message && <p aria-live="polite" className={`rounded-lg p-3 text-sm ${message.error ? 'bg-amber-50 text-amber-900' : 'bg-green-50 text-green-800'}`}>{message.text}</p>}
-    <button className="rounded-xl bg-[var(--color-brand)] px-5 py-3 font-bold text-white disabled:opacity-60" disabled={sending} type="submit">{sending ? 'Enviando…' : 'Enviar consulta'}</button>
+    <button className="rounded-full bg-[var(--color-brand)] px-6 py-3 font-bold text-white hover:bg-[var(--color-brand-dark)] disabled:opacity-60" disabled={sending} type="submit">{sending ? 'Enviando…' : 'Enviar consulta'}</button>
     <p className="text-xs text-slate-500">El envío requiere que SMTP y la dirección de soporte estén configurados en el entorno local.</p>
   </form>;
 }
@@ -88,9 +88,9 @@ export default function StoreInfoPage() {
   const title = isContact ? 'Contacto' : page?.title ?? 'Información';
   const intro = isContact ? 'Escríbenos sobre un producto, tu cuenta o un pedido. Incluye el número de pedido si corresponde.' : page?.intro ?? '';
   return <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-    <p className="text-sm font-bold uppercase tracking-wide text-[var(--color-brand)]">ElectroStore</p>
-    <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{title}</h1>
+    <p className="border-l-2 border-[var(--color-brand)] pl-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-brand)]">ElectroStore</p>
+    <h1 className="mt-3 text-4xl font-bold tracking-tight text-[var(--color-ink)] sm:text-5xl">{title}</h1>
     <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">{intro}</p>
-    {isContact ? <><ContactForm /><p className="mt-5 text-sm text-slate-600">También puedes revisar el estado y el detalle de tus compras en <Link className="font-semibold text-blue-700 underline" to="/pedidos">Mis pedidos</Link>.</p></> : <div className="mt-7 space-y-4">{page?.sections.map(([heading, body]) => <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" key={heading}><h2 className="text-lg font-bold text-slate-950">{heading}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{body}</p></section>)}</div>}
+    {isContact ? <><ContactForm /><p className="mt-5 text-sm text-slate-600">También puedes revisar el estado y el detalle de tus compras en <Link className="font-semibold text-blue-700 underline" to="/pedidos">Mis pedidos</Link>.</p></> : <div className="reveal-grid mt-8 space-y-4">{page?.sections.map(([heading, body], index) => <section className="surface-card grid rounded-xl p-5 sm:grid-cols-[3rem_1fr] sm:p-6" key={heading}><span className="font-[var(--font-display)] text-2xl text-[var(--color-brand)]">{String(index + 1).padStart(2, '0')}</span><div><h2 className="text-lg font-bold text-slate-950">{heading}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{body}</p></div></section>)}</div>}
   </main>;
 }

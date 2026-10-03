@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { resendVerification } from './auth.api';
+import { StoreIcon } from '../../app/StoreIcon';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
@@ -37,11 +38,11 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-12 sm:px-6 sm:py-16">
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-900/5 sm:p-8">
-        <span aria-hidden="true" className="grid size-12 place-items-center rounded-2xl bg-blue-50 text-2xl font-black text-[var(--color-brand)]">E</span>
-        <p className="mt-6 text-sm font-bold uppercase tracking-wide text-[var(--color-brand)]">Tu cuenta</p>
-        <h1 className="mt-2 text-3xl font-black text-slate-950">Iniciar sesión</h1>
-        <p className="mt-2 text-sm text-slate-600">Ingresa para ver tu perfil.</p>
+      <div className="surface-card rounded-[1.5rem] p-6 sm:p-8">
+        <span aria-hidden="true" className="grid size-12 place-items-center rounded-full bg-[var(--color-brand-soft)] text-[var(--color-brand)]"><StoreIcon className="size-5" name="account" /></span>
+        <p className="mt-6 border-l-2 border-[var(--color-brand)] pl-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-brand)]">Tu cuenta</p>
+        <h1 className="mt-3 text-4xl font-bold text-[var(--color-ink)]">Bienvenido de vuelta</h1>
+        <p className="mt-2 text-sm text-slate-600">Ingresa para revisar tus compras y datos guardados.</p>
         {notice && <p aria-live="polite" className="mt-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-900">{notice}</p>}
         <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
           <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
@@ -55,7 +56,7 @@ export default function LoginPage() {
           </label>
           {error && <p aria-live="polite" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
           {error?.includes('Confirma tu correo') && <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-950"><button className="font-semibold underline" onClick={() => void sendVerificationAgain()} type="button">Reenviar verificación</button>{verificationMessage && <p className="mt-2" aria-live="polite">{verificationMessage}</p>}</div>}
-          <button className="w-full rounded-xl bg-[var(--color-brand)] px-5 py-3 font-bold text-white shadow-sm transition hover:bg-blue-800 disabled:opacity-60" disabled={submitting} type="submit">
+          <button className="w-full rounded-full bg-[var(--color-brand)] px-5 py-3 font-bold text-white shadow-sm transition hover:bg-[var(--color-brand-dark)] disabled:opacity-60" disabled={submitting} type="submit">
             {submitting ? 'Ingresando…' : 'Iniciar sesión'}
           </button>
         </form>

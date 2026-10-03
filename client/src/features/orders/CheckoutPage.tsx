@@ -59,8 +59,8 @@ export default function CheckoutPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-      <p className="text-sm font-bold uppercase tracking-wide text-[var(--color-brand)]">Último paso</p>
-      <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Finaliza tu compra</h1>
+      <p className="border-l-2 border-[var(--color-brand)] pl-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-brand)]">Último paso</p>
+      <h1 className="mt-3 text-4xl font-bold tracking-tight text-[var(--color-ink)] sm:text-5xl">Finaliza tu compra</h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Ingresa los datos de entrega y confirma el pago con Webpay.</p>
       {loading && <p className="py-10 text-center text-slate-600">Cargando tu carrito…</p>}
       {!loading && (error || formError) && <p aria-live="polite" className="mt-6 rounded-xl bg-red-50 p-5 text-red-800">{formError ?? error}</p>}
@@ -72,7 +72,7 @@ export default function CheckoutPage() {
       )}
       {!loading && cart && cart.items.length > 0 && (
         <div className="mt-7 grid items-start gap-6 lg:grid-cols-[1fr_21rem]">
-          <form className="space-y-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7" onSubmit={handleSubmit}>
+          <form className="surface-card space-y-6 rounded-xl p-5 sm:p-7" onSubmit={handleSubmit}>
             <div>
               <h2 className="text-lg font-bold text-slate-950">Datos de envío</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">Completa la información de la persona que recibirá el pedido.</p>
@@ -103,25 +103,25 @@ export default function CheckoutPage() {
             <fieldset className="space-y-3">
               <legend className="text-sm font-bold text-slate-900">Tipo de despacho</legend>
               {shippingError && <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{shippingError}</p>}
-              {shippingQuotes.map((quote) => <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50" key={quote.method}>
-                <input checked={shippingMethod === quote.method} className="mt-1 accent-blue-700" name="shippingMethod" onChange={() => setShippingMethod(quote.method)} type="radio" value={quote.method} />
+              {shippingQuotes.map((quote) => <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 transition has-[:checked]:border-red-500 has-[:checked]:bg-red-50" key={quote.method}>
+                <input checked={shippingMethod === quote.method} className="mt-1 accent-red-700" name="shippingMethod" onChange={() => setShippingMethod(quote.method)} type="radio" value={quote.method} />
                 <span className="flex flex-1 justify-between gap-3"><span><span className="block text-sm font-bold text-slate-900">{quote.label}</span><span className="mt-1 block text-xs text-slate-500">Entrega estimada: {quote.minDays === quote.maxDays ? `${quote.maxDays} días hábiles` : `${quote.minDays} a ${quote.maxDays} días hábiles`}</span></span><span className="text-sm font-semibold text-slate-800">{formatPrice(quote.priceClp)}</span></span>
               </label>)}
               <p className="text-xs leading-5 text-slate-500">Simulación de ElectroStore para el proyecto; no requiere empresa de transporte. La fecha es referencial y el seguimiento se actualiza desde el estado del pedido.</p>
             </fieldset>
             <fieldset className="space-y-3">
               <legend className="text-sm font-bold text-slate-900">Método de pago</legend>
-              <label className="flex cursor-pointer gap-3 rounded-xl border border-slate-200 p-4 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                <input className="mt-1 accent-blue-700" defaultChecked name="paymentMethod" type="radio" value="webpay" />
+              <label className="flex cursor-pointer gap-3 rounded-xl border border-slate-200 p-4 transition has-[:checked]:border-red-500 has-[:checked]:bg-red-50">
+                <input className="mt-1 accent-red-700" defaultChecked name="paymentMethod" type="radio" value="webpay" />
                 <span><span className="block text-sm font-bold text-slate-900">Webpay</span><span className="mt-1 block text-xs leading-5 text-slate-500">Serás redirigido a Webpay para completar el pago.</span></span>
               </label>
             </fieldset>
             {formError && <p aria-live="polite" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{formError}</p>}
-            <button className="w-full rounded-xl bg-[var(--color-brand)] px-5 py-3.5 font-bold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-wait disabled:opacity-60" disabled={submitting || hasUnavailableItems || !selectedQuote || Boolean(shippingError)} type="submit">
+            <button className="w-full rounded-full bg-[var(--color-brand)] px-5 py-3.5 font-bold text-white shadow-sm transition hover:bg-[var(--color-brand-dark)] disabled:cursor-wait disabled:opacity-60" disabled={submitting || hasUnavailableItems || !selectedQuote || Boolean(shippingError)} type="submit">
               {submitting ? 'Creando pedido…' : 'Crear pedido'}
             </button>
           </form>
-          <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-44">
+          <aside className="surface-card h-fit rounded-xl p-5 lg:sticky lg:top-44">
             <h2 className="text-lg font-bold text-slate-950">Resumen de compra</h2>
             <ul className="mt-4 space-y-3">
               {cart.items.map((item) => (
