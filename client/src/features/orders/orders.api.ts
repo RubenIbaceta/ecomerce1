@@ -6,6 +6,8 @@ export type Order = {
   status: OrderStatus;
   subtotalClp: number;
   shippingClp: number;
+  shippingMethod: 'STANDARD' | 'EXPRESS';
+  estimatedDeliveryAt: string;
   totalClp: number;
   recipientName: string;
   phone: string;
@@ -15,6 +17,7 @@ export type Order = {
   reservationExpiresAt: string;
   paidAt: string | null;
   cancelledAt: string | null;
+  returnRequest: ReturnRequest | null;
   createdAt: string;
   items: Array<{
     id: string;
@@ -32,6 +35,10 @@ export type Order = {
     authorizedAt: string | null;
   }>;
 };
+
+export type ReturnRequest = { id: string; amountClp: number; reason: string; status: 'REQUESTED' | 'PROCESSING' | 'REFUNDED' | 'REJECTED'; adminNote: string | null; requestedAt: string; processedAt: string | null };
+
+export type ShippingQuote = { method: 'STANDARD' | 'EXPRESS'; label: string; priceClp: number; minDays: number; maxDays: number };
 
 type ApiBody<T> = {
   data?: T;
@@ -52,6 +59,7 @@ export async function createOrder(input: {
   address: string;
   commune: string;
   region: string;
+  shippingMethod: 'STANDARD' | 'EXPRESS';
 }) {
   const response = await fetch('/api/v1/orders', {
     method: 'POST',
@@ -62,6 +70,11 @@ export async function createOrder(input: {
   return readOrderResponse<Order>(response);
 }
 
+export async function fetchShippingQuotes(region: string) {
+  const response = await fetch('/api/v1/orders/shipping-quote?region=' + encodeURIComponent(region), { credentials: 'same-origin' });
+  return readOrderResponse<ShippingQuote[]>(response);
+}
+
 export async function fetchOrders() {
   const response = await fetch('/api/v1/orders', { credentials: 'same-origin' });
   return readOrderResponse<Order[]>(response);
@@ -69,14 +82,6 @@ export async function fetchOrders() {
 
 export async function fetchOrder(orderId: string) {
   const response = await fetch('/api/v1/orders/' + encodeURIComponent(orderId), { credentials: 'same-origin' });
-  return readOrderResponse<Order>(response);
-}
-
-export async function payDemoOrder(orderId: string) {
-  const response = await fetch('/api/v1/orders/' + encodeURIComponent(orderId) + '/payments/demo', {
-    method: 'POST',
-    credentials: 'same-origin',
-  });
   return readOrderResponse<Order>(response);
 }
 
@@ -94,6 +99,13 @@ export async function cancelOrder(orderId: string) {
     credentials: 'same-origin',
   });
   return readOrderResponse<Order>(response);
+}
+
+export async function requestOrderReturn(orderId: string, reason: string) {
+  const response = await fetch('/api/v1/orders/' + encodeURIComponent(orderId) + '/returns', {
+    method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reason }),
+  });
+  return readOrderResponse<ReturnRequest>(response);
 }
 
 export function orderStatusLabel(status: OrderStatus) {

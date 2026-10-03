@@ -22,9 +22,10 @@ export async function register(input: RegisterInput) {
 export async function login(email: string, password: string) {
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, name: true, email: true, role: true, isActive: true, passwordHash: true },
+    select: { id: true, name: true, email: true, role: true, isActive: true, passwordHash: true, emailVerifiedAt: true },
   });
   if (!user?.isActive || !(await verifyPassword(password, user.passwordHash))) return null;
+  if (!user.emailVerifiedAt) throw new Error('EMAIL_NOT_VERIFIED');
   return { id: user.id, name: user.name, email: user.email, role: user.role };
 }
 

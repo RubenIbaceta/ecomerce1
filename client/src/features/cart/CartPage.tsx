@@ -34,9 +34,9 @@ export default function CartPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
-      <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Tu compra</p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Carrito</h1>
+    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <p className="text-sm font-bold uppercase tracking-wide text-[var(--color-brand)]">Tu compra</p>
+      <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Carrito</h1>
       {loading && <p className="py-12 text-center text-slate-600">Cargando tu carrito…</p>}
       {!loading && (error || actionError) && (
         <div role="alert" className="mt-6 rounded-xl bg-red-50 p-5 text-red-800"><p>{actionError ?? error}</p>{error && <button className="mt-3 rounded-lg border border-red-300 px-4 py-2 font-semibold" onClick={() => void refresh()} type="button">Volver a cargar</button>}</div>
@@ -50,11 +50,11 @@ export default function CartPage() {
         </section>
       )}
       {!loading && !error && cart && cart.items.length > 0 && (
-        <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_19rem]">
+        <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_21rem]">
           <section aria-label="Productos en tu carrito" className="space-y-4">
             {cart.items.map((item) => (
-              <article className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5" key={item.id}>
-                <Link aria-label={'Ver ' + item.product.name} className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-100" to={'/productos/' + item.product.slug}>
+              <article className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:gap-5 sm:p-5" key={item.id}>
+                <Link aria-label={'Ver ' + item.product.name} className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 sm:size-28" to={'/productos/' + item.product.slug}>
                   {item.product.imageUrl
                     ? <img alt={item.product.name} className="h-full w-full object-contain p-1" src={item.product.imageUrl} />
                     : <span aria-hidden="true" className="text-3xl text-blue-700">✦</span>}
@@ -78,7 +78,7 @@ export default function CartPage() {
             ))}
           </section>
           <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5">
-            <h2 className="text-lg font-semibold text-slate-950">Resumen</h2>
+            <h2 className="text-lg font-bold text-slate-950">Resumen de compra</h2>
             <div className="mt-5 flex justify-between text-sm text-slate-600">
               <span>Productos ({cart.itemCount})</span>
               <span>{formatPrice(cart.subtotalClp)}</span>
@@ -87,9 +87,9 @@ export default function CartPage() {
               <span>Subtotal</span>
               <span>{formatPrice(cart.subtotalClp)}</span>
             </div>
-            <p className="mt-3 text-xs leading-5 text-slate-500">Envío gratis de demostración. El pago no generará un cobro real.</p>
+            <p className="mt-3 text-xs leading-5 text-slate-500">Revisa el total y la información de entrega antes de confirmar tu pedido.</p>
             {hasUnavailableItems && <p className="mt-3 text-sm text-red-700">Ajusta los productos sin stock antes de continuar.</p>}
-            <Link aria-disabled={hasUnavailableItems} className={'mt-5 inline-flex w-full justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white ' + (hasUnavailableItems ? 'pointer-events-none bg-slate-400' : 'bg-blue-700 hover:bg-blue-800')} to="/checkout" tabIndex={hasUnavailableItems ? -1 : undefined}>
+            <Link aria-disabled={hasUnavailableItems} className={'mt-5 inline-flex w-full justify-center rounded-xl px-4 py-3 text-sm font-bold text-white transition ' + (hasUnavailableItems ? 'pointer-events-none bg-slate-400' : 'bg-[var(--color-brand)] shadow-sm hover:bg-blue-800')} to="/checkout" tabIndex={hasUnavailableItems ? -1 : undefined}>
               Continuar al checkout
             </Link>
             <Link className="mt-5 inline-flex w-full justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50" to="/catalogo">

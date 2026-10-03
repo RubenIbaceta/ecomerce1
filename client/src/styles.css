@@ -7,12 +7,47 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #0f172a;
-  background: #f8fafc;
+  color: #101828;
+  background: #f5f7fa;
+  --color-ink: #101828;
+  --color-page: #f5f7fa;
+  --color-brand: #155eef;
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  color: #fff;
+  background: #155eef;
+}
+
+.admin-page input,
+.admin-page select,
+.admin-page textarea {
+  border-radius: 0.625rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.admin-page input:focus,
+.admin-page select:focus,
+.admin-page textarea:focus {
+  border-color: #155eef;
+  outline: 2px solid transparent;
+  box-shadow: 0 0 0 3px rgb(21 94 239 / 14%);
 }

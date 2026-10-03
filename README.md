@@ -1,38 +1,27 @@
-# Electronics Store Demo
+# ElectroStore
 
-E-commerce de práctica de una tienda de **hardware y tecnología para PC**, desarrollado como proyecto Full Stack.
+E-commerce de práctica para una tienda de **hardware y tecnología para PC**, desarrollado como proyecto Full Stack y portafolio.
 
 ## Tecnologías
 
-- React + TypeScript + Vite
-- Tailwind CSS
+- React + TypeScript + Vite y Tailwind CSS
 - Node.js + Express
-- PostgreSQL
-- Docker
+- PostgreSQL + Prisma
+- Docker Compose para PostgreSQL
 
 ## Funcionalidades
 
-- Registro e inicio/cierre de sesión.
-- Perfil de cliente.
-- Sesiones persistidas en PostgreSQL.
-- Área de administración protegida por rol.
-- Contraseñas almacenadas con hash scrypt; nunca en texto plano.
-- Carrito persistente por cuenta, con cantidades y subtotal calculado por la API.
-- Checkout con datos de entrega e historial de pedidos.
-- Reserva transaccional de stock, vencimiento/liberación de reservas y pago simulado sin cobros reales.
-- Webpay Plus en ambiente de integración: redirección al formulario alojado por Transbank y confirmación de pago en el backend.
-- Panel de administración protegido por rol para crear, editar, activar/desactivar productos, ajustar stock y avanzar o cancelar pedidos.
-- Carga de imágenes JPG, PNG y WebP para productos desde el panel de administración.
-- Imágenes locales comprimidas para el catálogo y carrusel con controles accesibles en la página principal.
-- Los pedidos guardan copias históricas de SKU, nombre y precio de cada producto.
-- Catálogo de productos
-- Categorías
-- Búsqueda y filtros
-- Ordenamiento
-- Paginación
-- Detalle de productos
-- API REST
-- Base de datos PostgreSQL
+- Registro, acceso, verificación de correo, recuperación/cambio de contraseña y perfil.
+- Sesiones persistidas en PostgreSQL; contraseñas protegidas con scrypt.
+- Catálogo con categorías, búsqueda, filtros, ordenamiento, paginación y fichas completas de producto.
+- Carrito persistente y checkout con dirección, cotización local de despacho y Webpay.
+- Reserva transaccional de stock; vencimientos, cancelaciones y pagos rechazados liberan unidades.
+- Webpay Plus en ambiente de integración; el backend verifica el resultado antes de confirmar el pedido.
+- Seguimiento interno por estado de pedido, administrado manualmente.
+- Solicitudes de devolución dentro de 30 días desde el pago y gestión de reembolsos desde administración.
+- Administración de productos, imágenes, cuentas, pedidos, ventas confirmadas, stock bajo y devoluciones.
+- Formulario de contacto por correo y páginas Sobre nosotros, Despachos, Devoluciones, Privacidad y Términos.
+- No se guardan números de tarjeta ni CVV.
 
 ## Instalación
 
@@ -40,51 +29,78 @@ E-commerce de práctica de una tienda de **hardware y tecnología para PC**, des
 npm install
 ```
 
-Crear `.env` a partir de `.env.example` y configurar las variables necesarias.
-
-Iniciar PostgreSQL:
+Crea `.env` a partir de `.env.example`, configura `SESSION_SECRET` (al menos 32 caracteres) y `DATABASE_URL`, e inicia PostgreSQL:
 
 ```bash
 docker compose up -d
 ```
 
-Ejecutar migraciones y datos de prueba:
+Aplica las migraciones y carga el catálogo de referencia:
 
 ```bash
-npm run db:migrate --workspace @ecommerce/server
+npm run db:deploy --workspace @ecommerce/server
 npm run db:seed --workspace @ecommerce/server
 ```
 
-Iniciar el proyecto:
+Para el desarrollo normal, `db:deploy` aplica las migraciones pendientes sin solicitar un restablecimiento de datos. `db:migrate` se reserva para crear migraciones de desarrollo.
+
+Para crear el administrador inicial, define `ADMIN_EMAIL` y `ADMIN_PASSWORD` (12 caracteres o más) antes de ejecutar el seed. Las credenciales locales no se suben a GitHub.
+
+Inicia la aplicación:
 
 ```bash
 npm run dev
 ```
 
-Frontend: `http://localhost:5173`
+Frontend: `http://localhost:5173` · API: `http://localhost:3001/api/v1/health`
 
-API: `http://localhost:3001/api/v1/health`
+## Correo
 
-## Verificación y seguridad
+Verificación, recuperación de contraseña y formulario de contacto requieren SMTP. Configura `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` y `SUPPORT_EMAIL` en el `.env` de la raíz. Para desarrollo puedes usar Gmail con una contraseña de aplicación (no la contraseña normal).
 
-Ejecuta las pruebas del servidor con:
+En desarrollo sin SMTP, el registro local marca la cuenta verificada para no bloquear las pruebas; los enlaces de verificación/recuperación y el formulario de contacto requieren SMTP. En producción el registro exige SMTP. Los enlaces de verificación duran 24 horas y los de recuperación 30 minutos.
+
+`APP_BASE_URL` debe coincidir con el origen desde donde se abre Vite, por ejemplo `http://localhost:5173` o `http://localhost:5174`.
+
+## Despacho simulado
+
+No requiere contratar una empresa de transporte. La tienda calcula tarifas de referencia: Metropolitana estándar $2.990 (2–3 días hábiles) o prioritario $4.990 (1–2 días); Valparaíso, O’Higgins y Maule estándar $4.990 (3–5 días); otras regiones estándar $6.990 (5–8 días). La fecha se guarda en el pedido y el cliente consulta cambios de estado desde su cuenta. La administración marca manualmente preparación, envío y entrega.
+
+Estas tarifas y plazos se pueden ajustar en `server/src/modules/orders/shipping.ts`. Son estimaciones del proyecto, sin transportista ni seguimiento externo.
+
+## Devoluciones y pagos
+
+El cliente puede solicitar una devolución hasta 30 días después de un pago confirmado. La administración revisa el producto recibido antes de procesar el reembolso. Un resultado Webpay ambiguo queda en revisión manual para evitar duplicar el reembolso. No se repone stock automáticamente: se debe inspeccionar el producto primero.
+
+Los pagos simulados no cobran dinero. Webpay está limitado al ambiente `integration`; no se realizan cobros comerciales. Las páginas de privacidad y términos describen el estado actual del proyecto y deben revisarse antes de cualquier uso comercial.
+
+## Imágenes y respaldos
+
+Las imágenes cargadas se guardan localmente en `server/uploads` (JPG, PNG o WebP de hasta 5 MB). `UPLOADS_DIR` permite elegir un directorio persistente; si se configura una ruta relativa, se resuelve desde el directorio de trabajo del servidor. La carpeta no se incluye en Git.
+
+Con Docker Compose y la base de datos iniciada, crea un respaldo comprimido:
 
 ```bash
+npm run db:backup --workspace @ecommerce/server
+```
+
+Los archivos quedan en `backups/`, ignorado por Git. Para restaurar de forma explícita:
+
+```bash
+npm run db:restore --workspace @ecommerce/server -- backups/archivo.dump --confirm-restore
+```
+
+La restauración reemplaza objetos existentes en la base configurada. Conserva respaldos fuera del equipo y añade `server/uploads` a la estrategia para proteger las imágenes.
+
+## Pruebas y seguridad
+
+```bash
+npm run typecheck
 npm run test --workspace @ecommerce/server
 ```
 
-Las pruebas cubren el hash de contraseñas, las transiciones permitidas de pedidos, la validación del origen en operaciones que modifican datos, el límite de intentos, las cabeceras de Helmet, las cargas de imagen permitidas, los límites de las peticiones, la protección del panel y el retorno de formulario de Webpay. Configura `APP_BASE_URL` con el origen exacto desde donde abres el frontend; la API lo usa para comprobar el origen de las solicitudes. El retorno de Webpay queda exceptuado porque llega como formulario del proveedor.
-
-Las imágenes cargadas desde administración se guardan en `server/uploads` (JPG, PNG o WebP de hasta 5 MB). Esa carpeta no se incluye en Git; para un despliegue con disco efímero habrá que configurar almacenamiento persistente u object storage.
+Las pruebas cubren contraseñas, transiciones de pedidos, cotizaciones/fechas hábiles de despacho, origen de solicitudes, límites, imágenes, protección de rutas y retorno Webpay. La aplicación valida el origen exacto configurado en `APP_BASE_URL`; el retorno de Webpay se exceptúa porque llega como formulario del proveedor.
 
 ## Estado
 
-🚧 Proyecto en desarrollo.
-
-Proyecto creado con fines de **práctica y portafolio profesional**.
-
-## Configuración de autenticación
-
-Configura en el archivo .env un SESSION_SECRET aleatorio de al menos 32 caracteres. Para crear el administrador inicial, define ADMIN_EMAIL y ADMIN_PASSWORD (12 caracteres o más) antes de ejecutar el seed. Estas credenciales son locales y no se suben a GitHub.
-
-Webpay se mantiene limitado al ambiente `integration`. El SDK utiliza las credenciales públicas de integración de Transbank si `WEBPAY_COMMERCE_CODE` y `WEBPAY_API_KEY` se dejan vacías. Para probar los retornos desde un equipo externo, define `WEBPAY_RETURN_URL` con una URL accesible que apunte a `/api/v1/payments/webpay/return`; `APP_BASE_URL` debe apuntar a la dirección desde donde se abre el frontend.
+Proyecto de práctica y portafolio en desarrollo. El catálogo contiene datos de referencia, Webpay está en integración y el despacho es una simulación local.

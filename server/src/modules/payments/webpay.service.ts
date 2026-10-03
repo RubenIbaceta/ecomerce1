@@ -119,7 +119,7 @@ export async function startWebpayPayment(userId: string, orderId: string) {
   }
 }
 
-async function rejectPaymentAndRelease(paymentId: string, responseCode: string) {
+export async function rejectPaymentAndRelease(paymentId: string, responseCode: string) {
   return serializable(async (transaction) => {
     const payment = await transaction.payment.findUnique({ where: { id: paymentId }, include: { order: { include: { items: true } } } });
     if (!payment) return null;
@@ -233,4 +233,21 @@ export async function handleWebpayReturn(token: string | undefined, cancelledTok
   return orderId
     ? { result: 'failed' as const, redirectUrl: frontendOrderUrl(orderId, 'failed') }
     : { result: 'review' as const, redirectUrl: frontendOrderUrl(payment.orderId, 'review') };
+}
+
+export async function refundWebpayPayment(token: string, amountClp: number) {
+  if (!Number.isSafeInteger(amountClp) || amountClp < 1) throw providerError('El monto de devolución no es válido.', 400, 'INVALID_REFUND_AMOUNT');
+  try {
+    const response = await integrationTransaction().refund(token, amountClp) as ProviderResponse;
+    const type = readField<string>(response, 'type', 'type');
+    const responseCode = readField<number>(response, 'responseCode', 'response_code');
+    if (type !== 'REVERSED' && !(type === 'NULLIFIED' && responseCode === 0)) {
+      throw providerError('Webpay no confirmó el reembolso. La solicitud quedó marcada para revisión manual.', 502, 'REFUND_REQUIRES_REVIEW');
+    }
+    return response;
+  } catch {
+    // Si la respuesta no fue concluyente, no se marca el reembolso como completado.
+    console.error('Webpay no pudo resolver la solicitud de devolución.');
+    throw providerError('Webpay no confirmó la devolución. La solicitud quedó marcada para revisión manual.', 502, 'REFUND_REQUIRES_REVIEW');
+  }
 }

@@ -10,6 +10,7 @@ import { cartRouter } from './modules/cart/cart.routes.ts';
 import { ordersRouter } from './modules/orders/orders.routes.ts';
 import { paymentsRouter } from './modules/payments/payments.routes.ts';
 import { adminRouter } from './modules/admin/admin.routes.ts';
+import { contactRouter } from './modules/contact/contact.routes.ts';
 import { requireAuth, requireRole } from './middleware/auth.ts';
 import { csrfProtection } from './middleware/csrf.ts';
 import { uploadsDirectory } from './modules/admin/upload-storage.ts';
@@ -71,6 +72,7 @@ export function createApp() {
   app.use('/api/v1/orders', ordersRouter);
   app.use('/api/v1', paymentsRouter);
   app.use('/api/v1/admin', adminRouter);
+  app.use('/api/v1/contact', contactRouter);
   app.get('/api/v1/admin/access', requireAuth, requireRole('ADMIN'), (_request, response) => {
     response.json({ data: { access: 'admin' } });
   });

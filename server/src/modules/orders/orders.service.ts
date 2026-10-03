@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/prisma.ts';
+import { estimateDeliveryDate, getShippingQuote, type ShippingMethod } from './shipping.ts';
 
 type ShippingInput = {
   recipientName: string;
@@ -8,6 +9,7 @@ type ShippingInput = {
   address: string;
   commune: string;
   region: string;
+  shippingMethod: ShippingMethod;
 };
 
 export class OrderError extends Error {
@@ -57,11 +59,14 @@ const orderInclude = {
     orderBy: { createdAt: 'desc' as const },
     select: { id: true, provider: true, status: true, amountClp: true, authorizedAt: true, createdAt: true },
   },
+  returnRequest: true,
 };
 
 export async function createOrder(userId: string, shipping: ShippingInput) {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + reservationMinutes() * 60 * 1000);
+  const shippingQuote = getShippingQuote(shipping.region, shipping.shippingMethod);
+  if (!shippingQuote) throw new OrderError('El despacho prioritario solo está disponible en la Región Metropolitana.', 400, 'INVALID_SHIPPING_METHOD');
 
   return inSerializableTransaction(async (transaction) => {
     const cart = await transaction.cart.findUnique({
@@ -102,6 +107,9 @@ export async function createOrder(userId: string, shipping: ShippingInput) {
         throw new OrderError('El total del pedido supera el monto permitido.', 400, 'ORDER_TOTAL_TOO_HIGH');
       }
     }
+    if (!Number.isSafeInteger(subtotalClp + shippingQuote.priceClp) || subtotalClp + shippingQuote.priceClp > 2_147_483_647) {
+      throw new OrderError('El total del pedido supera el monto permitido.', 400, 'ORDER_TOTAL_TOO_HIGH');
+    }
 
     for (const item of cart.items) {
       const reserved = await transaction.product.updateMany({
@@ -123,8 +131,10 @@ export async function createOrder(userId: string, shipping: ShippingInput) {
         userId,
         status: 'PENDING_PAYMENT',
         subtotalClp,
-        shippingClp: 0,
-        totalClp: subtotalClp,
+        shippingClp: shippingQuote.priceClp,
+        shippingMethod: shippingQuote.method,
+        estimatedDeliveryAt: estimateDeliveryDate(now, shippingQuote.maxDays),
+        totalClp: subtotalClp + shippingQuote.priceClp,
         recipientName: shipping.recipientName,
         phone: shipping.phone,
         address: shipping.address,
@@ -163,6 +173,31 @@ export function getOrder(userId: string, orderId: string) {
     where: { id: orderId, userId },
     include: orderInclude,
   });
+}
+
+export async function requestOrderReturn(userId: string, orderId: string, reason: string) {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId },
+    include: { payments: { where: { status: 'APPROVED' }, take: 1 }, returnRequest: true },
+  });
+  if (!order) throw new OrderError('No encontramos ese pedido.', 404, 'ORDER_NOT_FOUND');
+  if (!['PAID', 'PREPARING', 'SHIPPED', 'COMPLETED'].includes(order.status) || !order.paidAt || order.payments.length === 0) {
+    throw new OrderError('Solo puedes solicitar devolución de una compra pagada y confirmada.', 409, 'ORDER_NOT_RETURNABLE');
+  }
+  const daysSincePayment = (Date.now() - order.paidAt.getTime()) / (24 * 60 * 60 * 1000);
+  if (daysSincePayment > 30) throw new OrderError('El plazo de solicitud de devolución es de 30 días desde el pago.', 409, 'RETURN_WINDOW_EXPIRED');
+  if (order.returnRequest) throw new OrderError('Este pedido ya tiene una solicitud de devolución.', 409, 'RETURN_ALREADY_REQUESTED');
+  try {
+    return await prisma.returnRequest.create({
+      data: { orderId, amountClp: order.totalClp, reason },
+      include: { order: { select: { orderNumber: true } } },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      throw new OrderError('Este pedido ya tiene una solicitud de devolución.', 409, 'RETURN_ALREADY_REQUESTED');
+    }
+    throw error;
+  }
 }
 
 export async function payDemoOrder(userId: string, orderId: string) {

@@ -2,16 +2,21 @@ export type Category = {
   id: string;
   name: string;
   slug: string;
+  description?: string | null;
   _count: { products: number };
 };
 
 export type Product = {
   id: string;
-  sku?: string;
+  sku: string;
   slug: string;
   name: string;
   description: string;
+  features: string[];
+  specifications: string;
+  condition: 'Nuevo' | 'Reacondicionado' | 'Usado';
   priceClp: number;
+  transferPriceClp: number | null;
   stock: number;
   imageUrl: string | null;
   category: { name: string; slug: string };

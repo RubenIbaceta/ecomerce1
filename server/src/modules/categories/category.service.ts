@@ -8,6 +8,7 @@ export function listCategories() {
       id: true,
       name: true,
       slug: true,
+      description: true,
       _count: { select: { products: { where: { isActive: true } } } },
     },
   });

@@ -1,5 +1,13 @@
 import type { Category } from '../catalog/catalog.api';
 
+export type AdminDashboard = {
+  sales: Record<'today' | 'week' | 'month', { revenueClp: number; orderCount: number }>;
+  pendingOrderCount: number;
+  lowStockCount: number;
+  lowStockProducts: Array<{ id: string; sku: string; name: string; stock: number; category: { name: string } }>;
+  topSellingProducts: Array<{ id: string; sku: string; name: string; stock: number; unitsSold: number }>;
+};
+
 export type AdminProduct = {
   id: string;
   categoryId: string;
@@ -7,11 +15,31 @@ export type AdminProduct = {
   slug: string;
   name: string;
   description: string;
+  features: string[];
+  specifications: string;
+  condition: 'Nuevo' | 'Reacondicionado' | 'Usado';
   priceClp: number;
+  transferPriceClp: number | null;
   stock: number;
   imageUrl: string | null;
   isActive: boolean;
   category: { name: string; isActive: boolean };
+};
+export type AdminProductPage = {
+  data: AdminProduct[];
+  pagination: { page: number; limit: number; total: number; pages: number };
+};
+export type AdminUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: 'CUSTOMER' | 'ADMIN';
+  isActive: boolean;
+  createdAt: string;
+};
+export type AdminUserPage = {
+  data: AdminUser[];
+  pagination: { page: number; limit: number; total: number; pages: number };
 };
 
 export type AdminOrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'CANCELLED' | 'PREPARING' | 'SHIPPED' | 'COMPLETED';
@@ -29,9 +57,26 @@ export type AdminOrder = {
   region: string;
   createdAt: string;
   paidAt: string | null;
+  returnRequest: AdminReturnRequest | null;
   user: { name: string; email: string };
   items: Array<{ id: string; sku: string; productName: string; unitPriceClp: number; quantity: number }>;
   payments: Array<{ id: string; provider: 'DEMO' | 'WEBPAY'; status: 'PENDING' | 'APPROVED' | 'REJECTED'; amountClp: number; authorizedAt: string | null }>;
+};
+export type AdminReturnRequest = {
+  id: string;
+  amountClp: number;
+  reason: string;
+  status: 'REQUESTED' | 'PROCESSING' | 'REFUNDED' | 'REJECTED';
+  adminNote: string | null;
+  requestedAt: string;
+  processedAt: string | null;
+  order: {
+    orderNumber: string;
+    totalClp: number;
+    user: { name: string; email: string };
+    payments: Array<{ id: string; provider: 'DEMO' | 'WEBPAY'; reference: string; amountClp: number }>;
+    items: Array<{ id: string; productName: string; sku: string; quantity: number }>;
+  };
 };
 
 export type ProductInput = {
@@ -39,7 +84,11 @@ export type ProductInput = {
   sku: string;
   name: string;
   description: string;
+  features: string[];
+  specifications: string;
+  condition: 'Nuevo' | 'Reacondicionado' | 'Usado';
   priceClp: number;
+  transferPriceClp: number | null;
   stock: number;
   imageUrl: string | null;
 };
@@ -60,9 +109,24 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body.data;
 }
 
-export function fetchAdminProducts(q = '') {
-  const query = q.trim() ? '?q=' + encodeURIComponent(q.trim()) : '';
-  return request<AdminProduct[]>('/products' + query);
+export function fetchAdminDashboard() {
+  return request<AdminDashboard>('/dashboard');
+}
+
+export function fetchAdminProducts(q = '', page = 1, limit = 10) {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (q.trim()) params.set('q', q.trim());
+  return request<AdminProductPage>('/products?' + params.toString());
+}
+
+export function fetchAdminUsers(q = '', page = 1, limit = 10) {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (q.trim()) params.set('q', q.trim());
+  return request<AdminUserPage>('/users?' + params.toString());
+}
+
+export function updateAdminUser(id: string, input: { name: string; role: AdminUser['role']; isActive: boolean }) {
+  return request<AdminUser>('/users/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify(input) });
 }
 
 export function createAdminProduct(input: ProductInput) {
@@ -93,6 +157,14 @@ export async function uploadAdminImage(file: File) {
 
 export function fetchAdminOrders() {
   return request<AdminOrder[]>('/orders');
+}
+
+export function fetchAdminReturnRequests() {
+  return request<AdminReturnRequest[]>('/returns');
+}
+
+export function updateAdminReturnRequest(id: string, status: 'REQUESTED' | 'REFUNDED' | 'REJECTED', manualConfirmation = false) {
+  return request<AdminReturnRequest>('/returns/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ status, manualConfirmation }) });
 }
 
 export function updateAdminOrderStatus(id: string, status: AdminOrderStatus) {

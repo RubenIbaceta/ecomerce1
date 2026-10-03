@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { fetchCategories, fetchProducts, formatPrice, type Category, type Product } from './catalog.api';
+import { useSearchParams } from 'react-router-dom';
+import { fetchCategories, fetchProducts, type Category, type Product } from './catalog.api';
+import ProductCard from './ProductCard';
 
 type Listing = {
   data: Product[];
@@ -70,35 +71,36 @@ export default function CatalogPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">Encuentra tu próximo equipo</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Catálogo</h1>
+    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <div className="rounded-3xl bg-[var(--color-ink)] px-6 py-8 text-white sm:px-9 sm:py-10">
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-200">Encuentra tu próximo equipo</p>
+        <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Catálogo</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">Explora los productos disponibles y usa los filtros para encontrar lo que buscas.</p>
       </div>
 
-      <form key={searchParams.toString()} className="mt-8 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 sm:grid-cols-2 lg:grid-cols-6" onSubmit={submitFilters}>
+      <form key={searchParams.toString()} className="mt-7 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 lg:grid-cols-6 lg:p-6" onSubmit={submitFilters}>
         <label className="flex flex-col gap-2 text-sm font-medium text-slate-700 lg:col-span-2">
           Buscar
-          <input className="rounded-lg border border-slate-300 px-3 py-2 font-normal" defaultValue={query} name="q" placeholder="Notebook, audífonos…" />
+          <input className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" defaultValue={query} name="q" placeholder="Notebook, audífonos…" />
         </label>
         <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
           Categoría
-          <select className="rounded-lg border border-slate-300 px-3 py-2 font-normal" defaultValue={category} name="category">
+          <select className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" defaultValue={category} name="category">
             <option value="">Todas</option>
             {categories.map((item) => <option key={item.id} value={item.slug}>{item.name}</option>)}
           </select>
         </label>
         <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
           Precio desde
-          <input className="rounded-lg border border-slate-300 px-3 py-2 font-normal" defaultValue={minPrice} min="0" name="minPrice" type="number" />
+          <input className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" defaultValue={minPrice} min="0" name="minPrice" type="number" />
         </label>
         <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
           Precio hasta
-          <input className="rounded-lg border border-slate-300 px-3 py-2 font-normal" defaultValue={maxPrice} min="0" name="maxPrice" type="number" />
+          <input className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" defaultValue={maxPrice} min="0" name="maxPrice" type="number" />
         </label>
         <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
           Ordenar
-          <select className="rounded-lg border border-slate-300 px-3 py-2 font-normal" defaultValue={sort} name="sort">
+          <select className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" defaultValue={sort} name="sort">
             <option value="newest">Más recientes</option>
             <option value="price_asc">Precio: menor a mayor</option>
             <option value="price_desc">Precio: mayor a menor</option>
@@ -106,7 +108,7 @@ export default function CatalogPage() {
           </select>
         </label>
         <div className="flex items-end sm:col-span-2 lg:col-span-6">
-          <button className="w-full rounded-lg bg-blue-700 px-5 py-2.5 font-semibold text-white hover:bg-blue-800 sm:w-auto" type="submit">Aplicar filtros</button>
+          <button className="w-full rounded-lg bg-[var(--color-brand)] px-5 py-3 font-bold text-white shadow-sm transition hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 sm:w-auto" type="submit">Aplicar filtros</button>
         </div>
       </form>
 
@@ -119,21 +121,7 @@ export default function CatalogPage() {
           <>
             <p className="mb-4 text-sm text-slate-600">{listing.pagination.total} productos</p>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {listing.data.map((product) => (
-                <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white" key={product.id}>
-                  <Link aria-label={`Ver ${product.name}`} className="block" to={`/productos/${product.slug}`}>
-                    <div className="flex aspect-[16/10] items-center justify-center bg-gradient-to-br from-slate-100 to-blue-100">
-                      {product.imageUrl ? <img alt={product.name} className="h-full w-full object-contain p-3" src={product.imageUrl} /> : <span aria-hidden="true" className="text-5xl text-blue-700">✦</span>}
-                    </div>
-                    <div className="p-5">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{product.category.name}</p>
-                      <h2 className="mt-2 text-lg font-semibold text-slate-950">{product.name}</h2>
-                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{product.description}</p>
-                      <p className="mt-4 text-xl font-bold text-slate-950">{formatPrice(product.priceClp)}</p>
-                    </div>
-                  </Link>
-                </article>
-              ))}
+              {listing.data.map((product) => <ProductCard key={product.id} product={product} />)}
             </div>
             {listing.pagination.pages > 1 && (
               <div className="mt-8 flex items-center justify-center gap-4">
