@@ -1,14 +1,22 @@
 import { Router } from 'express';
+import { rateLimit } from 'express-rate-limit';
 import { z } from 'zod';
 import { requireAuth } from '../../middleware/auth.ts';
 import { startWebpayPayment, handleWebpayReturn } from './webpay.service.ts';
 
 export const paymentsRouter = Router();
+const webpayStartLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: { code: 'TOO_MANY_PAYMENT_ATTEMPTS', message: 'Has iniciado muchos intentos de pago. Intenta más tarde.' } },
+});
 
 const orderIdSchema = z.string().uuid();
 const tokenSchema = z.string().trim().min(1).max(128);
 
-paymentsRouter.post('/orders/:orderId/payments/webpay', requireAuth, async (request, response, next) => {
+paymentsRouter.post('/orders/:orderId/payments/webpay', requireAuth, webpayStartLimiter, async (request, response, next) => {
   const orderId = orderIdSchema.safeParse(request.params.orderId);
   if (!orderId.success) {
     response.status(400).json({ error: { code: 'INVALID_ORDER_ID', message: 'El número de pedido no es válido.' } });

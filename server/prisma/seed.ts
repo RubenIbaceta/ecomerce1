@@ -11,24 +11,24 @@ const catalog = [
     name: 'Computación',
     slug: 'computacion',
     products: [
-      { sku: 'COMP-NB-001', slug: 'notebook-zen-14', name: 'Notebook Zen 14', description: 'Notebook liviano de 14 pulgadas para trabajo y estudio.', priceClp: 699990, stock: 12 },
-      { sku: 'COMP-MO-001', slug: 'monitor-view-27', name: 'Monitor View 27', description: 'Monitor IPS de 27 pulgadas con resolución QHD.', priceClp: 279990, stock: 8 },
+      { sku: 'COMP-NB-001', slug: 'notebook-zen-14', name: 'Notebook Zen 14', description: 'Notebook liviano de 14 pulgadas para trabajo y estudio.', priceClp: 699990, stock: 12, imageUrl: '/images/laptop.jpg' },
+      { sku: 'COMP-MO-001', slug: 'monitor-view-27', name: 'Monitor View 27', description: 'Monitor IPS de 27 pulgadas con resolución QHD.', priceClp: 279990, stock: 8, imageUrl: '/images/monitor.jpg' },
     ],
   },
   {
     name: 'Audio',
     slug: 'audio',
     products: [
-      { sku: 'AUD-AU-001', slug: 'audifonos-wave-pro', name: 'Audífonos Wave Pro', description: 'Audífonos inalámbricos con cancelación de ruido.', priceClp: 89990, stock: 24 },
-      { sku: 'AUD-PA-001', slug: 'parlante-pocket', name: 'Parlante Pocket', description: 'Parlante Bluetooth portátil y resistente a salpicaduras.', priceClp: 39990, stock: 18 },
+      { sku: 'AUD-AU-001', slug: 'audifonos-wave-pro', name: 'Audífonos Wave Pro', description: 'Audífonos inalámbricos con cancelación de ruido.', priceClp: 89990, stock: 24, imageUrl: '/images/audifonos.jpg' },
+      { sku: 'AUD-PA-001', slug: 'parlante-pocket', name: 'Parlante Pocket', description: 'Parlante Bluetooth portátil y resistente a salpicaduras.', priceClp: 39990, stock: 18, imageUrl: '/images/bocina.jpg' },
     ],
   },
   {
     name: 'Accesorios',
     slug: 'accesorios',
     products: [
-      { sku: 'ACC-TE-001', slug: 'teclado-mecanico-key', name: 'Teclado mecánico Key', description: 'Teclado mecánico compacto con conexión USB-C.', priceClp: 64990, stock: 15 },
-      { sku: 'ACC-MO-001', slug: 'mouse-precision', name: 'Mouse Precision', description: 'Mouse inalámbrico ergonómico con sensor de precisión.', priceClp: 24990, stock: 30 },
+      { sku: 'ACC-TE-001', slug: 'teclado-mecanico-key', name: 'Teclado mecánico Key', description: 'Teclado mecánico compacto con conexión USB-C.', priceClp: 64990, stock: 15, imageUrl: '/images/teclado.jpg' },
+      { sku: 'ACC-MO-001', slug: 'mouse-precision', name: 'Mouse Precision', description: 'Mouse inalámbrico ergonómico con sensor de precisión.', priceClp: 24990, stock: 30, imageUrl: '/images/mouse.jpg' },
     ],
   },
 ];

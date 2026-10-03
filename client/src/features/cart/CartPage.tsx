@@ -4,7 +4,7 @@ import { formatPrice } from '../catalog/catalog.api';
 import { useCart } from './CartContext';
 
 export default function CartPage() {
-  const { cart, loading, error, updateQuantity, removeItem } = useCart();
+  const { cart, loading, error, refresh, updateQuantity, removeItem } = useCart();
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyItem, setBusyItem] = useState<string | null>(null);
   const hasUnavailableItems = cart?.items.some((item) => !item.available) ?? false;
@@ -39,7 +39,7 @@ export default function CartPage() {
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Carrito</h1>
       {loading && <p className="py-12 text-center text-slate-600">Cargando tu carrito…</p>}
       {!loading && (error || actionError) && (
-        <p aria-live="polite" className="mt-6 rounded-xl bg-red-50 p-5 text-red-800">{actionError ?? error}</p>
+        <div role="alert" className="mt-6 rounded-xl bg-red-50 p-5 text-red-800"><p>{actionError ?? error}</p>{error && <button className="mt-3 rounded-lg border border-red-300 px-4 py-2 font-semibold" onClick={() => void refresh()} type="button">Volver a cargar</button>}</div>
       )}
       {!loading && !error && cart?.items.length === 0 && (
         <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-8 text-center">
@@ -56,7 +56,7 @@ export default function CartPage() {
               <article className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5" key={item.id}>
                 <Link aria-label={'Ver ' + item.product.name} className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-100" to={'/productos/' + item.product.slug}>
                   {item.product.imageUrl
-                    ? <img alt={item.product.name} className="h-full w-full object-cover" src={item.product.imageUrl} />
+                    ? <img alt={item.product.name} className="h-full w-full object-contain p-1" src={item.product.imageUrl} />
                     : <span aria-hidden="true" className="text-3xl text-blue-700">✦</span>}
                 </Link>
                 <div className="min-w-0 flex-1">

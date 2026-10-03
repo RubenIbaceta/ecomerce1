@@ -21,6 +21,9 @@ E-commerce de práctica de una tienda de **hardware y tecnología para PC**, des
 - Checkout con datos de entrega e historial de pedidos.
 - Reserva transaccional de stock, vencimiento/liberación de reservas y pago simulado sin cobros reales.
 - Webpay Plus en ambiente de integración: redirección al formulario alojado por Transbank y confirmación de pago en el backend.
+- Panel de administración protegido por rol para crear, editar, activar/desactivar productos, ajustar stock y avanzar o cancelar pedidos.
+- Carga de imágenes JPG, PNG y WebP para productos desde el panel de administración.
+- Imágenes locales comprimidas para el catálogo y carrusel con controles accesibles en la página principal.
 - Los pedidos guardan copias históricas de SKU, nombre y precio de cada producto.
 - Catálogo de productos
 - Categorías
@@ -61,6 +64,18 @@ npm run dev
 Frontend: `http://localhost:5173`
 
 API: `http://localhost:3001/api/v1/health`
+
+## Verificación y seguridad
+
+Ejecuta las pruebas del servidor con:
+
+```bash
+npm run test --workspace @ecommerce/server
+```
+
+Las pruebas cubren el hash de contraseñas, las transiciones permitidas de pedidos, la validación del origen en operaciones que modifican datos, el límite de intentos, las cabeceras de Helmet, las cargas de imagen permitidas, los límites de las peticiones, la protección del panel y el retorno de formulario de Webpay. Configura `APP_BASE_URL` con el origen exacto desde donde abres el frontend; la API lo usa para comprobar el origen de las solicitudes. El retorno de Webpay queda exceptuado porque llega como formulario del proveedor.
+
+Las imágenes cargadas desde administración se guardan en `server/uploads` (JPG, PNG o WebP de hasta 5 MB). Esa carpeta no se incluye en Git; para un despliegue con disco efímero habrá que configurar almacenamiento persistente u object storage.
 
 ## Estado
 

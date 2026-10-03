@@ -6,7 +6,12 @@ export function startReservationCleanup() {
       .then((count) => {
         if (count > 0) console.log('Se liberaron reservas vencidas de ' + count + ' pedido(s).');
       })
-      .catch((error: unknown) => console.error('No se pudieron liberar las reservas vencidas.', error));
+      .catch((error: unknown) => {
+        const detail = process.env.NODE_ENV === 'production'
+          ? error instanceof Error ? error.name : 'UnknownError'
+          : error;
+        console.error('No se pudieron liberar las reservas vencidas.', detail);
+      });
   }
 
   clean();

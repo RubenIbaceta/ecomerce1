@@ -1,9 +1,17 @@
 import { Router } from 'express';
+import { rateLimit } from 'express-rate-limit';
 import { z } from 'zod';
 import { requireAuth } from '../../middleware/auth.ts';
 import { cancelOrder, createOrder, getOrder, listOrders, payDemoOrder } from './orders.service.ts';
 
 export const ordersRouter = Router();
+const orderActionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: { code: 'TOO_MANY_ACTIONS', message: 'Has realizado muchas acciones de pedido. Intenta más tarde.' } },
+});
 
 const checkoutSchema = z.object({
   recipientName: z.string().trim().min(2).max(100),
@@ -15,11 +23,11 @@ const checkoutSchema = z.object({
 
 ordersRouter.use(requireAuth);
 
-function orderIdFromRequest(value: string) {
+function orderIdFromRequest(value: unknown) {
   return z.string().uuid().safeParse(value);
 }
 
-ordersRouter.post('/', async (request, response, next) => {
+ordersRouter.post('/', orderActionLimiter, async (request, response, next) => {
   const parsed = checkoutSchema.safeParse(request.body);
   if (!parsed.success) {
     response.status(400).json({
@@ -45,7 +53,7 @@ ordersRouter.get('/', async (request, response, next) => {
   }
 });
 
-ordersRouter.post('/:orderId/payments/demo', async (request, response, next) => {
+ordersRouter.post('/:orderId/payments/demo', orderActionLimiter, async (request, response, next) => {
   const parsedId = orderIdFromRequest(request.params.orderId);
   if (!parsedId.success) {
     response.status(400).json({ error: { code: 'INVALID_ORDER_ID', message: 'El número de pedido no es válido.' } });
@@ -58,7 +66,7 @@ ordersRouter.post('/:orderId/payments/demo', async (request, response, next) => 
   }
 });
 
-ordersRouter.post('/:orderId/cancel', async (request, response, next) => {
+ordersRouter.post('/:orderId/cancel', orderActionLimiter, async (request, response, next) => {
   const parsedId = orderIdFromRequest(request.params.orderId);
   if (!parsedId.success) {
     response.status(400).json({ error: { code: 'INVALID_ORDER_ID', message: 'El número de pedido no es válido.' } });

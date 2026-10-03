@@ -1,4 +1,5 @@
 import { Link, Route, Routes } from 'react-router-dom';
+import HomeSlider from './HomeSlider';
 import CatalogPage from '../features/catalog/CatalogPage';
 import ProductPage from '../features/catalog/ProductPage';
 import { AuthProvider, useAuth } from '../features/auth/AuthContext';
@@ -15,24 +16,11 @@ import OrdersPage from '../features/orders/OrdersPage';
 
 function HomePage() {
   return (
-    <main className="mx-auto flex min-h-[70vh] max-w-5xl flex-col justify-center px-6 py-16">
-      <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">
-        Proyecto de portafolio
-      </p>
-      <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-slate-950 sm:text-6xl">
-        Tecnología para lo que viene.
-      </h1>
-      <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-        Una tienda demo de hardware para PC. Explora el catálogo, arma tu carrito y sigue tus pedidos.
-      </p>
-      <div className="mt-10">
-        <Link
-          className="inline-flex rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white transition hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
-          to="/catalogo"
-        >
-          Explorar catálogo
-        </Link>
-      </div>
+    <main className="min-h-[70vh]">
+      <HomeSlider />
+      <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
+        <p className="text-center text-sm leading-6 text-slate-500">Una tienda de demostración para explorar tecnología, armar tu carrito y seguir tus pedidos.</p>
+      </section>
     </main>
   );
 }
@@ -55,12 +43,12 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-5xl flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <Link className="text-lg font-bold tracking-tight text-slate-950" to="/">
             Electro<span className="text-blue-700">Demo</span>
           </Link>
           <nav aria-label="Navegación principal">
-            <div className="flex items-center gap-5">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:justify-end sm:gap-x-5">
               <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/catalogo">
               Catálogo
               </Link>
@@ -70,6 +58,7 @@ function AppContent() {
                     Carrito{cart && cart.itemCount > 0 ? ' (' + cart.itemCount + ')' : ''}
                   </Link>
                   <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/pedidos">Mis pedidos</Link>
+                  {user.role === 'ADMIN' && <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/admin">Administración</Link>}
                   <Link className="text-sm font-medium text-slate-700 hover:text-blue-700" to="/perfil">Mi cuenta</Link>
                   <button
                     className="text-sm font-medium text-slate-700 hover:text-blue-700"

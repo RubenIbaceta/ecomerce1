@@ -51,7 +51,7 @@ export default function CheckoutPage() {
         <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_19rem]">
           <form className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6" onSubmit={handleSubmit}>
             <p className="text-sm leading-6 text-slate-600">
-              Este pedido reserva el stock durante un tiempo limitado. El pago se simula dentro de la aplicación y no genera un cobro real.
+              Este pedido reserva el stock durante un tiempo limitado. Puedes pagar con Webpay en ambiente de integración o aprobar el pago simulado; ninguno genera un cobro real.
             </p>
             {hasUnavailableItems && <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Hay productos sin stock suficiente. Vuelve al carrito y ajusta las cantidades.</p>}
             <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">

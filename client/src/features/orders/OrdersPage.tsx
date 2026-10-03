@@ -9,15 +9,18 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
+    setError(null);
     fetchOrders()
       .then((result) => { if (active) setOrders(result); })
       .catch((cause: unknown) => { if (active) setError(cause instanceof Error ? cause.message : 'No se pudieron cargar los pedidos.'); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [reload]);
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
@@ -25,7 +28,7 @@ export default function OrdersPage() {
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Mis pedidos</h1>
       {webpayResult === 'review' && <p aria-live="polite" className="mt-5 rounded-xl bg-amber-50 p-5 text-amber-900">No pudimos reconocer el retorno de Webpay. Abre un pedido y actualiza su estado.</p>}
       {loading && <p className="py-12 text-center text-slate-600">Cargando tus pedidos…</p>}
-      {!loading && error && <p className="mt-6 rounded-xl bg-red-50 p-5 text-red-800">{error}</p>}
+      {!loading && error && <div role="alert" className="mt-6 rounded-xl bg-red-50 p-5 text-red-800"><p>{error}</p><button className="mt-3 rounded-lg border border-red-300 px-4 py-2 font-semibold" onClick={() => setReload((value) => value + 1)} type="button">Reintentar</button></div>}
       {!loading && !error && orders.length === 0 && (
         <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-8 text-center">
           <p className="text-slate-600">Todavía no tienes pedidos.</p>

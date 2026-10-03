@@ -105,7 +105,7 @@ export default function OrderPage() {
               </div>
             </section>
           )}
-          {order.status === 'PAID' && <p className="mt-6 rounded-xl bg-green-50 p-5 text-green-800">Pago de demostración aprobado. No se realizó un cobro real.</p>}
+          {order.status === 'PAID' && <p className="mt-6 rounded-xl bg-green-50 p-5 text-green-800">{order.payments.some((payment) => payment.provider === 'WEBPAY' && payment.status === 'APPROVED') ? 'Webpay confirmó el pago en ambiente de pruebas.' : 'Pago de demostración aprobado. No se realizó un cobro real.'}</p>}
           <div className="mt-6 grid gap-6 md:grid-cols-[1fr_18rem]">
             <section className="rounded-2xl border border-slate-200 bg-white p-5">
               <h2 className="text-lg font-semibold text-slate-950">Productos</h2>
