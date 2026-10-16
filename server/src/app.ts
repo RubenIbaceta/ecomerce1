@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'node:url';
 import helmet from 'helmet';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
@@ -76,6 +77,20 @@ export function createApp() {
   app.get('/api/v1/admin/access', requireAuth, requireRole('ADMIN'), (_request, response) => {
     response.json({ data: { access: 'admin' } });
   });
+
+  app.use('/api', (_request, response) => {
+    response.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ruta no encontrada.' } });
+  });
+
+  if (process.env.NODE_ENV === 'production') {
+    const clientDirectory = fileURLToPath(new URL('../../client/dist/', import.meta.url));
+    app.use(express.static(clientDirectory, { index: false }));
+    app.get('/{*path}', (request, response, next) => {
+      if (!request.accepts('html')) return next();
+      response.setHeader('Cache-Control', 'no-cache');
+      response.sendFile('index.html', { root: clientDirectory });
+    });
+  }
 
   app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {
     const errorType = typeof error === 'object' && error !== null && 'type' in error && typeof error.type === 'string'

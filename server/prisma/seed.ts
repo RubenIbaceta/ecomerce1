@@ -170,6 +170,7 @@ async function main() {
         email: adminEmail,
         passwordHash,
         role: 'ADMIN',
+        emailVerifiedAt: new Date(),
       },
     });
     console.log('Catálogo cargado y administrador configurado.');

@@ -25,6 +25,8 @@ E-commerce de práctica para una tienda de **hardware y tecnología para PC**, d
 
 ## Instalación
 
+Para publicar la demostración en internet con Render y Neon, sigue [la guía de despliegue](DEPLOY.md).
+
 ```bash
 npm install
 ```

@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: electrostore
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run deploy:build
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: WEBPAY_ENV
+        value: integration
+      - key: WEBPAY_RETURN_URL
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

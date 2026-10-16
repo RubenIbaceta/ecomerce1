@@ -7,6 +7,8 @@
     "server"
   ],
   "scripts": {
+    "start": "npm run start --workspace @ecommerce/server",
+    "deploy:build": "npm run build && npm run db:deploy --workspace @ecommerce/server && node server/scripts/seed-if-empty.mjs",
     "dev": "concurrently -k -n client,server -c cyan,magenta \"npm run dev --workspace @ecommerce/client\" \"npm run dev --workspace @ecommerce/server\"",
     "build": "npm run build --workspace @ecommerce/client && npm run build --workspace @ecommerce/server",
     "typecheck": "npm run typecheck --workspace @ecommerce/client && npm run typecheck --workspace @ecommerce/server"
